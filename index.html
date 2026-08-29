@@ -220,25 +220,16 @@
     background:var(--gold); opacity:0.8;
   }
 
-  /* Route graphic (Travel Security slide) */
-  .route-box{position:relative; aspect-ratio:1/1; max-width:440px; margin:0 auto;}
-  .route-svg{position:absolute; inset:0; width:100%; height:100%;}
-  .route-svg path{fill:none; stroke:rgba(63,169,160,0.45); stroke-width:2; stroke-dasharray:6 7;}
-  .route-node{
-    position:absolute; width:12px; height:12px; margin:-6px 0 0 -6px; border-radius:50%;
-    background:var(--gold); box-shadow:0 0 0 5px rgba(212,167,58,0.18);
+  /* Route map photo (Travel Security slide) */
+  .route-graphic{position:relative; max-width:440px; margin:0 auto;}
+  .route-photo{
+    position:relative; aspect-ratio:1/1;
+    border-radius:12px; overflow:hidden;
+    border:1px solid var(--line);
+    box-shadow:0 0 44px rgba(63,169,160,0.10);
   }
-  .route-node.teal{background:var(--teal); box-shadow:0 0 0 5px rgba(63,169,160,0.18);}
-  .route-marker{
-    position:absolute; width:11px; height:11px; margin:-5.5px 0 0 -5.5px; border-radius:50%;
-    background:var(--red); box-shadow:0 0 0 5px rgba(192,57,43,0.22);
-    animation:travelRoute 6s ease-in-out infinite alternate;
-  }
-  @keyframes travelRoute{
-    0%{top:80%; left:13%;}
-    33%{top:55%; left:34%;}
-    66%{top:31%; left:48%;}
-    100%{top:10%; left:87%;}
+  .route-photo img{
+    width:100%; height:100%; object-fit:cover; display:block;
   }
 
   /* Lens graphic (The Lens slide) */
@@ -377,7 +368,7 @@
   .footer-bottom{display:flex; justify-content:space-between; flex-wrap:wrap; gap:14px; color:var(--text-dim); font-size:13px; font-family:'IBM Plex Mono',monospace;}
 
   @media (prefers-reduced-motion: reduce){
-    .globe-wire, .scan-lens, .pulse-ring, .route-marker, .lens-unit, .ticker-track{animation:none !important;}
+    .globe-wire, .scan-lens, .pulse-ring, .lens-unit, .ticker-track{animation:none !important;}
   }
 </style>
 </head>
@@ -468,15 +459,11 @@
             <a href="#contact" class="btn btn-ghost">START FREE TRIAL</a>
           </div>
         </div>
-        <div class="route-box">
-          <svg viewBox="0 0 300 300" preserveAspectRatio="none" class="route-svg">
-            <path d="M40,240 C90,180 60,120 140,100 C200,85 220,40 260,30" />
-          </svg>
-          <div class="route-node" style="top:80%; left:13%;"></div>
-          <div class="route-node" style="top:33%; left:47%;"></div>
-          <div class="route-node teal" style="top:10%; left:87%;"></div>
-          <div class="route-marker"></div>
-          <div class="radar-label mono">ROUTE PLANNING · LIVE TRACKING</div>
+        <div class="route-graphic">
+          <div class="route-photo">
+            <img src="travel-security-map.png" alt="Route planning and live tracking map across East Africa">
+          </div>
+          <div class="radar-label mono">ROUTE PLANNING &amp; LIVE TRACKING — WE ACCOMPANY YOU EVERY STEP OF THE WAY</div>
         </div>
       </div>
     </div>
