@@ -169,6 +169,90 @@
     letter-spacing:0.08em; white-space:nowrap;
   }
 
+  /* Hero slideshow */
+  .hero-slides{position:relative; z-index:2;}
+  .hero-slide{display:none; animation:heroFade .5s ease;}
+  .hero-slide.active{display:block;}
+  @keyframes heroFade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+  .hero-arrow{
+    position:absolute; top:44%; transform:translateY(-50%); z-index:5;
+    background:rgba(19,27,46,0.65); border:1px solid var(--line); color:var(--text);
+    width:42px; height:42px; border-radius:50%; font-size:22px; line-height:1; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .2s ease, border-color .2s ease, color .2s ease;
+  }
+  .hero-arrow:hover{background:rgba(212,167,58,0.16); border-color:var(--gold); color:var(--gold);}
+  .hero-arrow.prev{left:6px;}
+  .hero-arrow.next{right:6px;}
+  @media(max-width:760px){.hero-arrow{display:none;}}
+  .hero-dots{display:flex; justify-content:center; gap:10px; margin-top:-10px; margin-bottom:10px; position:relative; z-index:3;}
+  .dot{width:9px; height:9px; padding:0; border-radius:50%; border:none; background:var(--line); cursor:pointer; transition:background .2s ease, transform .2s ease;}
+  .dot.active{background:var(--gold); transform:scale(1.35);}
+
+  /* Pulse graphic (Monitor & Report slide) */
+  .pulse-box{position:relative; aspect-ratio:1/1; max-width:440px; margin:0 auto; display:flex; align-items:center; justify-content:center;}
+  .pulse-ring{position:absolute; border:1px solid rgba(212,167,58,0.4); border-radius:50%; animation:pulseExpand 3s ease-out infinite;}
+  .pulse-ring.pr1{width:36%; height:36%; animation-delay:0s;}
+  .pulse-ring.pr2{width:62%; height:62%; animation-delay:1s;}
+  .pulse-ring.pr3{width:88%; height:88%; animation-delay:2s;}
+  @keyframes pulseExpand{0%{opacity:0.75; transform:scale(0.85);} 100%{opacity:0; transform:scale(1.12);}}
+  .pulse-core{
+    width:22%; height:22%; border-radius:50%; position:relative; z-index:2;
+    background:var(--panel-2); border:1px solid var(--gold);
+    box-shadow:0 0 24px rgba(212,167,58,0.25);
+  }
+  .pulse-core::before{
+    content:""; position:absolute; inset:30%; border-radius:50%;
+    background:var(--gold); opacity:0.8;
+  }
+
+  /* Route graphic (Travel Security slide) */
+  .route-box{position:relative; aspect-ratio:1/1; max-width:440px; margin:0 auto;}
+  .route-svg{position:absolute; inset:0; width:100%; height:100%;}
+  .route-svg path{fill:none; stroke:rgba(63,169,160,0.45); stroke-width:2; stroke-dasharray:6 7;}
+  .route-node{
+    position:absolute; width:12px; height:12px; margin:-6px 0 0 -6px; border-radius:50%;
+    background:var(--gold); box-shadow:0 0 0 5px rgba(212,167,58,0.18);
+  }
+  .route-node.teal{background:var(--teal); box-shadow:0 0 0 5px rgba(63,169,160,0.18);}
+  .route-marker{
+    position:absolute; width:11px; height:11px; margin:-5.5px 0 0 -5.5px; border-radius:50%;
+    background:var(--red); box-shadow:0 0 0 5px rgba(192,57,43,0.22);
+    animation:travelRoute 6s ease-in-out infinite alternate;
+  }
+  @keyframes travelRoute{
+    0%{top:80%; left:13%;}
+    33%{top:55%; left:34%;}
+    66%{top:31%; left:48%;}
+    100%{top:10%; left:87%;}
+  }
+
+  /* Lens graphic (The Lens slide) */
+  .lens-box{position:relative; aspect-ratio:1/1; max-width:440px; margin:0 auto; overflow:hidden; border-radius:12px;}
+  .data-grid{
+    position:absolute; inset:8%;
+    background-image:radial-gradient(rgba(154,166,189,0.4) 1.5px, transparent 1.5px);
+    background-size:26px 26px;
+  }
+  .lens-unit{
+    position:absolute; width:44%; height:44%; top:8%; left:8%;
+    animation:lensMove 7s ease-in-out infinite;
+  }
+  .lens-glass{
+    position:absolute; inset:0; border-radius:50%;
+    border:5px solid var(--teal); background:rgba(63,169,160,0.10);
+    box-shadow:0 0 0 6px rgba(63,169,160,0.14), inset 0 0 26px rgba(212,167,58,0.18);
+  }
+  .lens-handle{
+    position:absolute; width:7px; height:52px; background:var(--teal); border-radius:4px;
+    bottom:-36px; right:-6px; transform:rotate(45deg); transform-origin:top center;
+  }
+  @keyframes lensMove{
+    0%{transform:translate(0,0);}
+    50%{transform:translate(58%,58%);}
+    100%{transform:translate(0,0);}
+  }
+
   /* Ticker */
   .ticker-bar{
     border-top:1px solid var(--line); border-bottom:1px solid var(--line);
@@ -301,28 +385,109 @@
 
 <section class="hero">
   <div class="hero-grid"></div>
-  <div class="hero-inner">
-    <div>
-      <div class="eyebrow">LIVE MONITORING · PAN-AFRICAN COVERAGE</div>
-      <h1>Empowering decisions<br>with <span class="accent">intelligence</span>.</h1>
-      <p>AfriLens delivers real-time security intelligence, threat assessments, and travel security services so your teams can operate across Africa with confidence — not guesswork.</p>
-      <div class="btn-row">
-        <a href="#contact" class="btn btn-primary">START FREE TRIAL</a>
-        <a href="#sis" class="btn btn-ghost">VIEW CAPABILITIES</a>
+  <div class="hero-slides">
+    <button class="hero-arrow prev" aria-label="Previous slide">‹</button>
+    <button class="hero-arrow next" aria-label="Next slide">›</button>
+
+    <div class="hero-slide active">
+      <div class="hero-inner">
+        <div>
+          <div class="eyebrow">LIVE MONITORING · PAN-AFRICAN COVERAGE</div>
+          <h1>Empowering decisions<br>with <span class="accent">intelligence</span>.</h1>
+          <p>AfriLens delivers real-time security intelligence, threat assessments, and travel security services so your teams can operate across Africa with confidence — not guesswork.</p>
+          <div class="btn-row">
+            <a href="#contact" class="btn btn-primary">START FREE TRIAL</a>
+            <a href="#sis" class="btn btn-ghost">VIEW CAPABILITIES</a>
+          </div>
+        </div>
+        <div class="radar-box">
+          <div class="radar-ring r1"></div>
+          <div class="radar-ring r2"></div>
+          <div class="radar-ring r3"></div>
+          <div class="radar-ring r4"></div>
+          <div class="africa-silhouette"></div>
+          <div class="radar-sweep"></div>
+          <div class="blip" style="top:30%; left:52%; animation-delay:0s;"></div>
+          <div class="blip red" style="top:55%; left:38%; animation-delay:0.8s;"></div>
+          <div class="blip teal" style="top:68%; left:58%; animation-delay:1.4s;"></div>
+          <div class="blip" style="top:42%; left:65%; animation-delay:2s;"></div>
+          <div class="radar-label mono">SCANNING 54 MARKETS · REAL-TIME</div>
+        </div>
       </div>
     </div>
-    <div class="radar-box">
-      <div class="radar-ring r1"></div>
-      <div class="radar-ring r2"></div>
-      <div class="radar-ring r3"></div>
-      <div class="radar-ring r4"></div>
-      <div class="africa-silhouette"></div>
-      <div class="radar-sweep"></div>
-      <div class="blip" style="top:30%; left:52%; animation-delay:0s;"></div>
-      <div class="blip red" style="top:55%; left:38%; animation-delay:0.8s;"></div>
-      <div class="blip teal" style="top:68%; left:58%; animation-delay:1.4s;"></div>
-      <div class="blip" style="top:42%; left:65%; animation-delay:2s;"></div>
-      <div class="radar-label mono">SCANNING 54 MARKETS · REAL-TIME</div>
+
+    <div class="hero-slide">
+      <div class="hero-inner">
+        <div>
+          <div class="eyebrow">CAPABILITY 01 · MONITOR & REPORT</div>
+          <h1>Signals surfaced<br>the moment they <span class="accent">emerge</span>.</h1>
+          <p>Continuous surveillance across 54 markets, paired with daily, weekly, and annual intelligence briefings that turn raw signals into clear, actionable context.</p>
+          <div class="btn-row">
+            <a href="#sis" class="btn btn-primary">VIEW CAPABILITIES</a>
+            <a href="#contact" class="btn btn-ghost">START FREE TRIAL</a>
+          </div>
+        </div>
+        <div class="pulse-box">
+          <div class="pulse-ring pr1"></div>
+          <div class="pulse-ring pr2"></div>
+          <div class="pulse-ring pr3"></div>
+          <div class="pulse-core"></div>
+          <div class="radar-label mono">CONTINUOUS SIGNAL FEED</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-slide">
+      <div class="hero-inner">
+        <div>
+          <div class="eyebrow">CAPABILITY 02 · MOVE SAFELY</div>
+          <h1>Every route mapped.<br>Every mile <span class="accent">protected</span>.</h1>
+          <p>From trip risk assessments to convoy escorts and real-time asset tracking, we manage the logistics of moving safely through unfamiliar terrain.</p>
+          <div class="btn-row">
+            <a href="#tss" class="btn btn-primary">TRAVEL SECURITY</a>
+            <a href="#contact" class="btn btn-ghost">START FREE TRIAL</a>
+          </div>
+        </div>
+        <div class="route-box">
+          <svg viewBox="0 0 300 300" preserveAspectRatio="none" class="route-svg">
+            <path d="M40,240 C90,180 60,120 140,100 C200,85 220,40 260,30" />
+          </svg>
+          <div class="route-node" style="top:80%; left:13%;"></div>
+          <div class="route-node" style="top:33%; left:47%;"></div>
+          <div class="route-node teal" style="top:10%; left:87%;"></div>
+          <div class="route-marker"></div>
+          <div class="radar-label mono">ROUTE PLANNING · LIVE TRACKING</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-slide">
+      <div class="hero-inner">
+        <div>
+          <div class="eyebrow">THE LENS · CRISIS MONITORING</div>
+          <h1>Turning signals<br>into <span class="accent">foresight</span>.</h1>
+          <p>Monitor. Investigate. Connect. Analyse. Understand. The Lens pairs real-time alerts with a searchable archive of historical data, so you can anticipate what's next.</p>
+          <div class="btn-row">
+            <a href="https://thelens.afrilensconsulting.com/" target="_blank" rel="noopener noreferrer" class="btn btn-primary">REQUEST ACCESS</a>
+            <a href="#lens-card" class="btn btn-ghost">LEARN MORE</a>
+          </div>
+        </div>
+        <div class="lens-box">
+          <div class="data-grid"></div>
+          <div class="lens-unit">
+            <div class="lens-glass"></div>
+            <div class="lens-handle"></div>
+          </div>
+          <div class="radar-label mono">MONITOR · INVESTIGATE · ANALYSE</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-dots">
+      <button class="dot active" aria-label="Slide 1"></button>
+      <button class="dot" aria-label="Slide 2"></button>
+      <button class="dot" aria-label="Slide 3"></button>
+      <button class="dot" aria-label="Slide 4"></button>
     </div>
   </div>
   <div class="ticker-bar">
@@ -373,7 +538,7 @@
         <h3>Bespoke Assessments</h3>
         <p>Focused briefs on a specific concern — a regional flashpoint, a single site, a single trip — with analysis and recommendations sized to the decision in front of you.</p>
       </div>
-      <div class="card card--featured">
+      <div class="card card--featured" id="lens-card">
         <span class="card-num mono">[ ACCESS ]</span>
         <h3>The Lens</h3>
         <p class="card-tagline">Monitor. Investigate. Connect. Analyse. Understand.</p>
@@ -525,6 +690,35 @@
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Hero slideshow
+  (function(){
+    const slides = document.querySelectorAll('.hero-slide');
+    const dots = document.querySelectorAll('.hero-dots .dot');
+    const prevBtn = document.querySelector('.hero-arrow.prev');
+    const nextBtn = document.querySelector('.hero-arrow.next');
+    if(!slides.length) return;
+    let current = 0;
+    let timer;
+
+    function show(index){
+      slides[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      current = (index + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      dots[current].classList.add('active');
+    }
+    function next(){ show(current + 1); }
+    function prev(){ show(current - 1); }
+    function startAutoplay(){ timer = setInterval(next, 6500); }
+    function resetAutoplay(){ clearInterval(timer); startAutoplay(); }
+
+    dots.forEach((dot, i) => dot.addEventListener('click', () => { show(i); resetAutoplay(); }));
+    if(nextBtn) nextBtn.addEventListener('click', () => { next(); resetAutoplay(); });
+    if(prevBtn) prevBtn.addEventListener('click', () => { prev(); resetAutoplay(); });
+
+    startAutoplay();
+  })();
   document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
