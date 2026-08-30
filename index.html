@@ -144,18 +144,34 @@
     position:absolute; inset:6%; border-radius:50%; pointer-events:none;
     box-shadow:0 0 60px rgba(63,169,160,0.14);
   }
-  /* dashed routes connecting each risk node */
+  /* the microscope/lens on the globe slide — top/left set by JS, sweeps slowly between markers */
+  .scan-lens{
+    position:absolute; width:24%; height:24%; top:38%; left:6%; z-index:3;
+    transition: top 3.2s cubic-bezier(.45,0,.2,1), left 3.2s cubic-bezier(.45,0,.2,1);
+  }
+  .scan-glass{
+    position:absolute; inset:0; border-radius:50%;
+    border:5px solid rgba(237,239,242,0.9);
+    background:rgba(237,239,242,0.06);
+    box-shadow:0 0 0 6px rgba(212,167,58,0.2), 0 4px 18px rgba(0,0,0,0.45);
+  }
+  .scan-handle{
+    position:absolute; width:7px; height:44px; border-radius:4px;
+    background:rgba(237,239,242,0.9);
+    bottom:-30px; right:-2px; transform:rotate(45deg); transform-origin:top center;
+  }
+
+  /* --- reusable building blocks for an interactive route map (used on the Travel Security slide) --- */
   .route-svg{
     position:absolute; inset:6%; pointer-events:none; z-index:2;
     overflow:visible;
   }
   .route-svg polyline{
     fill:none;
-    stroke:rgba(63,169,160,0.45);
+    stroke:rgba(63,169,160,0.5);
     stroke-width:0.6;
     stroke-dasharray:2.2 2.2;
   }
-  /* clickable node markers — lets a visitor jump the analyst to any node */
   .node-hit{
     position:absolute; width:22px; height:22px; margin:-11px 0 0 -11px;
     border-radius:50%; border:1px solid rgba(63,169,160,0.5);
@@ -165,11 +181,11 @@
   }
   .node-hit:hover{ transform:scale(1.35); border-color:var(--gold); background:rgba(212,167,58,0.18); }
   .node-hit:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
-  /* the analyst — position (top/left) is set by JS as it travels between nodes */
+  /* the analyst figure — position (top/left) set by JS as it travels between route nodes */
   .scan-figure{
     position:absolute; width:15%; height:15%; top:38%; left:6%; z-index:4;
     transform:translate(-50%, -50%);
-    transition: top 2.4s cubic-bezier(.45,0,.2,1), left 2.4s cubic-bezier(.45,0,.2,1);
+    transition: top 3s cubic-bezier(.45,0,.2,1), left 3s cubic-bezier(.45,0,.2,1);
     filter: drop-shadow(0 0 6px rgba(63,169,160,0.65));
   }
   .scan-figure svg{ width:100%; height:100%; display:block; }
@@ -190,6 +206,23 @@
     letter-spacing:0.06em; text-align:center; width:100%; max-width:340px;
   }
   .globe-box .radar-label{ bottom:-100px; }
+
+  /* Kenya / travel-security route map */
+  .kenya-map-box{
+    position:relative;
+    width:100%;
+    min-width:260px;
+    max-width:440px;
+    aspect-ratio:1/1;
+    margin:0 auto;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    box-shadow:0 0 44px rgba(63,169,160,0.10);
+  }
+  .kenya-map-svg{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+  .kenya-map-box .route-svg{ inset:0; }
+  .kenya-map-box .radar-label{ bottom:-40px; }
 
   /* Hero slideshow */
   .hero-slides{position:relative; z-index:2;}
@@ -228,17 +261,8 @@
     background:var(--gold); opacity:0.8;
   }
 
-  /* Route map photo (Travel Security slide) */
+  /* Route map (Travel Security slide) */
   .route-graphic{position:relative; max-width:440px; margin:0 auto;}
-  .route-photo{
-    position:relative; aspect-ratio:1/1;
-    border-radius:12px; overflow:hidden;
-    border:1px solid var(--line);
-    box-shadow:0 0 44px rgba(63,169,160,0.10);
-  }
-  .route-photo img{
-    width:100%; height:100%; object-fit:cover; display:block;
-  }
 
   /* Lens graphic (The Lens slide) */
   .lens-box{position:relative; aspect-ratio:1/1; max-width:440px; margin:0 auto; overflow:hidden; border-radius:12px;}
@@ -377,7 +401,7 @@
 
   @media (prefers-reduced-motion: reduce){
     .pulse-ring, .lens-unit, .ticker-track{animation:none !important;}
-    .scan-figure{transition:none !important;}
+    .scan-figure, .scan-lens{transition:none !important;}
   }
 </style>
 </head>
@@ -419,17 +443,9 @@
             <canvas id="alGlobeCanvas"></canvas>
           </div>
           <div class="globe-glow"></div>
-          <svg class="route-svg" id="routeSvg" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <polyline id="routeLine" points=""></polyline>
-          </svg>
-          <div id="nodeHits"></div>
-          <div class="scan-figure" id="scanFigure">
-            <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="8" cy="5" r="2" stroke="#D4A73A" stroke-width="1.4"></circle>
-              <path d="M8 7 L8 14 M8 14 L5.2 20 M8 14 L10.4 19.5 M8 9.5 L14 9.5" stroke="#D4A73A" stroke-width="1.4"></path>
-              <circle cx="17.2" cy="9.5" r="3.1" stroke="#3FA9A0" stroke-width="1.5" fill="rgba(63,169,160,0.14)"></circle>
-              <path d="M19.4 11.7 L21.3 13.6" stroke="#3FA9A0" stroke-width="1.5"></path>
-            </svg>
+          <div class="scan-lens" id="scanLens">
+            <div class="scan-glass"></div>
+            <div class="scan-handle"></div>
           </div>
           <div class="intel-card" id="intelCard">
             <div class="intel-tag" id="intelTag">ADVISORY</div>
@@ -473,8 +489,24 @@
           </div>
         </div>
         <div class="route-graphic">
-          <div class="route-photo">
-            <img src="travel-security-map.png" alt="Route planning and live tracking map across East Africa">
+          <div class="kenya-map-box" id="kenyaMapBox">
+            <svg class="kenya-map-svg" id="kenyaMapSvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"></svg>
+            <svg class="route-svg" id="kenyaRouteSvg" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <polyline id="kenyaRouteLine" points=""></polyline>
+            </svg>
+            <div id="kenyaNodeHits"></div>
+            <div class="scan-figure" id="kenyaScanFigure">
+              <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="8" cy="5" r="2" stroke="#D4A73A" stroke-width="1.4"></circle>
+                <path d="M8 7 L8 14 M8 14 L5.2 20 M8 14 L10.4 19.5 M8 9.5 L14 9.5" stroke="#D4A73A" stroke-width="1.4"></path>
+                <circle cx="17.2" cy="9.5" r="3.1" stroke="#3FA9A0" stroke-width="1.5" fill="rgba(63,169,160,0.14)"></circle>
+                <path d="M19.4 11.7 L21.3 13.6" stroke="#3FA9A0" stroke-width="1.5"></path>
+              </svg>
+            </div>
+            <div class="intel-card" id="kenyaIntelCard">
+              <div class="intel-tag" id="kenyaIntelTag">CLEAR</div>
+              <div class="intel-text" id="kenyaIntelText">Convoy staging point — cleared for departure</div>
+            </div>
           </div>
           <div class="radar-label mono">ROUTE PLANNING &amp; LIVE TRACKING — WE ACCOMPANY YOU EVERY STEP OF THE WAY</div>
         </div>
@@ -886,65 +918,129 @@
     }
     startGlobe();
 
-    // draw the dashed routes connecting every node, in visiting order
-    var routeLine = document.getElementById('routeLine');
-    if(routeLine){
-      var pts = markers.map(function(m){ return m.pos.left + ',' + m.pos.top; });
-      pts.push(pts[0]); // close the loop back to the first node
-      routeLine.setAttribute('points', pts.join(' '));
-    }
-
-    // scanning figure (an analyst with a lens) travels between markers and
-    // surfaces the matching intel card; clicking a node jumps it there directly
-    var scanFigure = document.getElementById('scanFigure');
+    // the microscope/lens slowly sweeps between risk markers on the globe,
+    // surfacing the matching intel card each time it settles
+    var scanLens = document.getElementById('scanLens');
     var intelCard = document.getElementById('intelCard');
     var intelTag = document.getElementById('intelTag');
     var intelText = document.getElementById('intelText');
-    var nodeHits = document.getElementById('nodeHits');
     var tagColor = { ADVISORY: 'var(--red)', WATCH: 'var(--gold)', CLEAR: 'var(--teal)' };
     var mi = 0;
-    var cycleTimer = null;
 
     function sweepTo(m){
-      scanFigure.style.top = m.pos.top + '%';
-      scanFigure.style.left = m.pos.left + '%';
+      scanLens.style.top = m.pos.top + '%';
+      scanLens.style.left = m.pos.left + '%';
       intelCard.classList.remove('show');
       setTimeout(function(){
         intelTag.textContent = m.tag;
         intelTag.style.color = tagColor[m.tag];
         intelText.textContent = m.text;
         intelCard.classList.add('show');
-      }, reduceMotion ? 0 : 1900);
+      }, reduceMotion ? 0 : 2600);
+    }
+
+    sweepTo(markers[0]);
+    if(!reduceMotion){
+      setInterval(function(){
+        mi = (mi + 1) % markers.length;
+        sweepTo(markers[mi]);
+      }, 9500);
+    }
+  })();
+
+  // Kenya route map (Travel Security slide) — drawn map blended with the
+  // brand palette, with an analyst figure scanning slowly along the routes
+  (function(){
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var svg = document.getElementById('kenyaMapSvg');
+    if(!svg) return;
+
+    // simplified, stylized Kenya outline (not survey-accurate — decorative)
+    var kenyaOutline = '30,10 65,8 78,25 70,45 85,55 78,70 60,88 40,90 25,72 15,55 20,35 12,22 30,10';
+
+    svg.innerHTML =
+      '<defs>' +
+        '<linearGradient id="kenyaBg" x1="0" y1="0" x2="1" y2="1">' +
+          '<stop offset="0" stop-color="#1a2540"/>' +
+          '<stop offset="1" stop-color="#0b1220"/>' +
+        '</linearGradient>' +
+        '<linearGradient id="kenyaFill" x1="0" y1="0" x2="1" y2="1">' +
+          '<stop offset="0" stop-color="#3fa9a0" stop-opacity="0.55"/>' +
+          '<stop offset="1" stop-color="#d4a73a" stop-opacity="0.4"/>' +
+        '</linearGradient>' +
+      '</defs>' +
+      '<rect x="0" y="0" width="100" height="100" fill="url(#kenyaBg)"/>' +
+      '<g stroke="rgba(212,167,58,0.08)" stroke-width="0.4">' +
+        '<line x1="0" y1="20" x2="100" y2="20"/><line x1="0" y1="40" x2="100" y2="40"/>' +
+        '<line x1="0" y1="60" x2="100" y2="60"/><line x1="0" y1="80" x2="100" y2="80"/>' +
+        '<line x1="20" y1="0" x2="20" y2="100"/><line x1="40" y1="0" x2="40" y2="100"/>' +
+        '<line x1="60" y1="0" x2="60" y2="100"/><line x1="80" y1="0" x2="80" y2="100"/>' +
+      '</g>' +
+      '<polygon points="' + kenyaOutline + '" fill="url(#kenyaFill)" stroke="#d4a73a" stroke-width="1" ' +
+        'style="filter:drop-shadow(0 0 4px rgba(63,169,160,0.6))"/>';
+
+    // waypoints along the convoy loop — positions are in the same 0–100 space as the SVG viewBox
+    var waypoints = [
+      { name: 'Nairobi', x: 45, y: 55, tag: 'CLEAR',    text: 'Convoy staging point — cleared for departure' },
+      { name: 'Nakuru',  x: 35, y: 42, tag: 'WATCH',    text: 'Checkpoint bypass — monitor local advisories' },
+      { name: 'Kisumu',  x: 20, y: 40, tag: 'CLEAR',    text: 'Route conditions nominal — western corridor' },
+      { name: 'Garissa', x: 65, y: 40, tag: 'WATCH',    text: 'Security escort recommended — eastern route' },
+      { name: 'Mombasa', x: 68, y: 72, tag: 'ADVISORY', text: 'Coastal corridor — port congestion delays' }
+    ];
+
+    var routeLine = document.getElementById('kenyaRouteLine');
+    var pts = waypoints.map(function(w){ return w.x + ',' + w.y; });
+    pts.push(pts[0]);
+    routeLine.setAttribute('points', pts.join(' '));
+
+    var scanFigure = document.getElementById('kenyaScanFigure');
+    var intelCard = document.getElementById('kenyaIntelCard');
+    var intelTag = document.getElementById('kenyaIntelTag');
+    var intelText = document.getElementById('kenyaIntelText');
+    var nodeHits = document.getElementById('kenyaNodeHits');
+    var tagColor = { ADVISORY: 'var(--red)', WATCH: 'var(--gold)', CLEAR: 'var(--teal)' };
+    var wi = 0;
+    var cycleTimer = null;
+
+    function sweepTo(w){
+      scanFigure.style.top = w.y + '%';
+      scanFigure.style.left = w.x + '%';
+      intelCard.classList.remove('show');
+      setTimeout(function(){
+        intelTag.textContent = w.tag;
+        intelTag.style.color = tagColor[w.tag];
+        intelText.textContent = w.name + ' — ' + w.text;
+        intelCard.classList.add('show');
+      }, reduceMotion ? 0 : 2600);
     }
 
     function startCycle(){
       cycleTimer = setInterval(function(){
-        mi = (mi + 1) % markers.length;
-        sweepTo(markers[mi]);
-      }, 7000);
+        wi = (wi + 1) % waypoints.length;
+        sweepTo(waypoints[wi]);
+      }, 9500);
     }
     function resetCycle(){
       if(cycleTimer) clearInterval(cycleTimer);
       if(!reduceMotion) startCycle();
     }
 
-    // clickable node markers, positioned to match the route line exactly
-    markers.forEach(function(m, idx){
+    waypoints.forEach(function(w, idx){
       var hit = document.createElement('button');
       hit.type = 'button';
       hit.className = 'node-hit';
-      hit.style.top = m.pos.top + '%';
-      hit.style.left = m.pos.left + '%';
-      hit.setAttribute('aria-label', m.tag + ': ' + m.text);
+      hit.style.top = w.y + '%';
+      hit.style.left = w.x + '%';
+      hit.setAttribute('aria-label', w.name + ' — ' + w.tag + ': ' + w.text);
       hit.addEventListener('click', function(){
-        mi = idx;
-        sweepTo(m);
+        wi = idx;
+        sweepTo(w);
         resetCycle();
       });
       nodeHits.appendChild(hit);
     });
 
-    sweepTo(markers[0]);
+    sweepTo(waypoints[0]);
     if(!reduceMotion){
       startCycle();
     }
@@ -960,6 +1056,10 @@
     let current = 0;
     let timer;
 
+    // dwell time per slide (ms) — slide 0 (globe) and slide 2 (travel route map)
+    // get extra time so their scanning animations have room to play out
+    const dwell = [13000, 6500, 13000, 6500];
+
     function show(index){
       slides[current].classList.remove('active');
       dots[current].classList.remove('active');
@@ -969,8 +1069,11 @@
     }
     function next(){ show(current + 1); }
     function prev(){ show(current - 1); }
-    function startAutoplay(){ timer = setInterval(next, 6500); }
-    function resetAutoplay(){ clearInterval(timer); startAutoplay(); }
+    function startAutoplay(){
+      clearTimeout(timer);
+      timer = setTimeout(function(){ next(); startAutoplay(); }, dwell[current] || 6500);
+    }
+    function resetAutoplay(){ clearTimeout(timer); startAutoplay(); }
 
     dots.forEach((dot, i) => dot.addEventListener('click', () => { show(i); resetAutoplay(); }));
     if(nextBtn) nextBtn.addEventListener('click', () => { next(); resetAutoplay(); });
