@@ -718,6 +718,67 @@
       );
     }
 
+    // Draws a simple equirectangular map (lon -180..180 across, lat 90..-90 down)
+    // and returns it as a texture. This mapping matches latLonToVec3 above,
+    // so the glowing Africa shape lines up with where the risk markers sit.
+    function buildMapTexture(){
+      var w = 1024, h = 512;
+      var c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      var ctx = c.getContext('2d');
+
+      ctx.fillStyle = '#131b2e';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = 'rgba(154,166,189,0.14)';
+      ctx.lineWidth = 1;
+      for (var lon = -180; lon <= 180; lon += 20) {
+        var x = (lon + 180) / 360 * w;
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+      for (var lat = -80; lat <= 80; lat += 20) {
+        var y = (90 - lat) / 180 * h;
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+
+      function project(lon, lat) { return [(lon + 180) / 360 * w, (90 - lat) / 180 * h]; }
+
+      function drawShape(points, opts) {
+        ctx.beginPath();
+        points.forEach(function (p, i) {
+          var xy = project(p[0], p[1]);
+          if (i === 0) ctx.moveTo(xy[0], xy[1]); else ctx.lineTo(xy[0], xy[1]);
+        });
+        ctx.closePath();
+        if (opts.fill) { ctx.fillStyle = opts.fill; ctx.fill(); }
+        if (opts.stroke) { ctx.lineWidth = opts.lineWidth || 1; ctx.strokeStyle = opts.stroke; ctx.stroke(); }
+      }
+
+      // other continents — simplified, decorative outlines for world-map context
+      var faint = 'rgba(154,166,189,0.22)';
+      drawShape([[-160,68],[-95,72],[-60,58],[-95,48],[-130,50],[-160,68]], { stroke: faint }); // N. America / arctic
+      drawShape([[-125,48],[-100,30],[-95,16],[-107,20],[-118,32],[-125,48]], { stroke: faint }); // US / Mexico
+      drawShape([[-80,10],[-60,-4],[-70,-20],[-72,-45],[-68,-55],[-58,-34],[-50,-9],[-62,6],[-80,10]], { stroke: faint }); // South America
+      drawShape([[-10,60],[30,68],[40,54],[26,42],[8,44],[-9,48],[-10,60]], { stroke: faint }); // Europe
+      drawShape([[28,68],[100,70],[142,58],[128,34],[100,20],[68,15],[58,30],[44,40],[28,50],[28,68]], { stroke: faint }); // Asia
+      drawShape([[113,-12],[135,-10],[153,-28],[145,-38],[130,-32],[115,-22],[113,-12]], { stroke: faint }); // Australia
+
+      // Africa — filled and glowing, the brand's home continent
+      ctx.save();
+      ctx.shadowColor = 'rgba(63,169,160,0.9)';
+      ctx.shadowBlur = 16;
+      drawShape([
+        [-17,15],[-16,22],[10,37],[20,32],[32,31],[36,20],[43,12],[51,10],
+        [45,0],[40,-1],[40,-16],[35,-25],[30,-30],[18,-34],[12,-18],
+        [9,4],[-4,6],[-10,6],[-13,9],[-17,15]
+      ], { fill: 'rgba(63,169,160,0.38)', stroke: '#3fa9a0', lineWidth: 2 });
+      ctx.restore();
+
+      var tex = new THREE.CanvasTexture(c);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
     function buildGlobe(size){
       var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -730,10 +791,12 @@
       var group = new THREE.Group();
       scene.add(group);
 
-      // core sphere so the wireframe reads as a solid globe, not a wire cage
+      // core sphere carries the map texture, so it reads as a floating map
+      // glowing inside the transparent wireframe shell
+      var mapTexture = buildMapTexture();
       var core = new THREE.Mesh(
-        new THREE.SphereGeometry(1.97, 30, 22),
-        new THREE.MeshBasicMaterial({ color: 0x131b2e, transparent: true, opacity: 0.9 })
+        new THREE.SphereGeometry(1.97, 48, 32),
+        new THREE.MeshBasicMaterial({ map: mapTexture, transparent: true, opacity: 0.95 })
       );
       group.add(core);
 
