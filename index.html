@@ -153,14 +153,14 @@
     position:absolute; inset:0; border-radius:50%;
     border: 2px solid transparent;
     background:
-      radial-gradient(circle at 32% 26%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.16) 28%, rgba(255,255,255,0.05) 60%, rgba(255,255,255,0) 100%) padding-box,
-      linear-gradient(135deg, #f3dd9a, #a8791f) border-box;
+      radial-gradient(circle at 32% 26%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.14) 28%, rgba(255,255,255,0.04) 60%, rgba(255,255,255,0) 100%) padding-box,
+      linear-gradient(135deg, #f2f4f6, #aab2ba) border-box;
     background-clip: padding-box, border-box;
     box-shadow:
-      inset 0 0 8px rgba(255,255,255,0.45),
-      0 0 3px rgba(255,255,255,0.7),
-      0 0 16px rgba(212,167,58,0.6),
-      0 0 30px rgba(212,167,58,0.25);
+      inset 0 0 8px rgba(255,255,255,0.4),
+      0 0 3px rgba(255,255,255,0.75),
+      0 0 14px rgba(255,255,255,0.35),
+      0 0 26px rgba(255,255,255,0.15);
   }
   .scan-glass::after{
     content:"";
@@ -173,7 +173,7 @@
   }
   .scan-handle{
     position:absolute; width:4px; height:24px; border-radius:3px;
-    background:linear-gradient(180deg, #f3dd9a 0%, #c9a44c 55%, #8a6a22 100%);
+    background:linear-gradient(180deg, #f2f4f6 0%, #c3cad1 55%, #7d868f 100%);
     box-shadow:0 1px 2px rgba(0,0,0,0.45);
     bottom:-16px; right:-1px; transform:rotate(45deg); transform-origin:top center;
   }
@@ -772,8 +772,8 @@
       { name: 'East Africa',      lat: 3.18,   lon: 38.82, tag: 'ADVISORY', text: 'Regional border delays — East Africa corridor', pos: { top: 50, left: 50 }, nudge: { top: -6, left: -6 } },
       { name: 'Sahel',            lat: 15.33,  lon: 11.84, tag: 'WATCH',    text: 'Civil unrest indicators elevated — Sahel region', pos: { top: 50, left: 50 }, nudge: { top: -6, left: -6 } },
       { name: 'Southern Africa',  lat: -20.14, lon: 23.9,  tag: 'CLEAR',    text: 'Route conditions nominal — Southern Africa corridor', pos: { top: 50, left: 50 }, nudge: { top: -6, left: -6 } },
-      { name: 'West Africa Coast',lat: 10.45,  lon: 5.25,  tag: 'ADVISORY', text: 'Health notice issued — West African coastal states', pos: { top: 50, left: 50 }, nudge: { top: -6, left: -12 } },
-      { name: 'Central Africa',   lat: -0.26,  lon: 19.34, tag: 'WATCH',    text: 'Political transition monitored — Central Africa', pos: { top: 50, left: 50 }, nudge: { top: -6, left: -6 } }
+      { name: 'West Africa Coast',lat: 10.45,  lon: 5.25,  tag: 'ADVISORY', text: 'Health notice issued — West African coastal states', pos: { top: 50, left: 50 }, nudge: { top: -4, left: -12 } },
+      { name: 'Central Africa',   lat: -0.26,  lon: 19.34, tag: 'WATCH',    text: 'Political transition monitored — Central Africa', pos: { top: 50, left: 50 }, nudge: { top: -6, left: -4 } }
     ];
 
     function buildMapTexture(){
