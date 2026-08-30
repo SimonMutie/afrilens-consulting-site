@@ -146,19 +146,19 @@
   }
   /* the microscope/lens on the globe slide — top/left set by JS, sweeps slowly between markers */
   .scan-lens{
-    position:absolute; width:24%; height:24%; top:38%; left:6%; z-index:3;
+    position:absolute; width:12%; height:12%; top:38%; left:6%; z-index:3;
     transition: top 3.2s cubic-bezier(.45,0,.2,1), left 3.2s cubic-bezier(.45,0,.2,1);
   }
   .scan-glass{
     position:absolute; inset:0; border-radius:50%;
-    border:5px solid rgba(237,239,242,0.9);
+    border:3px solid rgba(237,239,242,0.9);
     background:rgba(237,239,242,0.06);
-    box-shadow:0 0 0 6px rgba(212,167,58,0.2), 0 4px 18px rgba(0,0,0,0.45);
+    box-shadow:0 0 0 4px rgba(212,167,58,0.2), 0 3px 12px rgba(0,0,0,0.45);
   }
   .scan-handle{
-    position:absolute; width:7px; height:44px; border-radius:4px;
+    position:absolute; width:4px; height:24px; border-radius:3px;
     background:rgba(237,239,242,0.9);
-    bottom:-30px; right:-2px; transform:rotate(45deg); transform-origin:top center;
+    bottom:-16px; right:-1px; transform:rotate(45deg); transform-origin:top center;
   }
 
   /* --- reusable building blocks for an interactive route map (used on the Travel Security slide) --- */
@@ -765,7 +765,7 @@
       // tight bounding box around Africa only — canvas stays transparent
       // everywhere else, so the texture reads as a floating cutout shape,
       // not a rectangular card
-      var lonMin = -20, lonMax = 54, latMin = -37, latMax = 39;
+      var lonMin = -20, lonMax = 54, latMin = -38, latMax = 40;
       var w = 640, h = Math.round(640 * (latMax - latMin) / (lonMax - lonMin));
       var c = document.createElement('canvas');
       c.width = w; c.height = h;
@@ -789,11 +789,29 @@
         if (opts.stroke) { ctx.lineWidth = opts.lineWidth || 1; ctx.strokeStyle = opts.stroke; ctx.stroke(); }
       }
 
+      // real coastline — derived from Natural Earth's public-domain admin-0
+      // country boundaries (all African countries merged into one outline),
+      // simplified from ~9,000 points down to these ~80 while preserving
+      // the actual shape, rather than a freehand approximation
       var africaPts = [
-        [-17,15],[-16,22],[10,37],[20,32],[32,31],[36,20],[43,12],[51,10],
-        [45,0],[40,-1],[40,-16],[35,-25],[30,-30],[18,-34],[12,-18],
-        [9,4],[-4,6],[-10,6],[-13,9],[-17,15]
+        [-11.44,6.79],[-16.61,12.17],[-17.63,14.73],[-16.27,17.17],[-16.28,20.09],[-17.06,21.00],
+        [-15.98,23.72],[-13.14,27.64],[-9.56,29.93],[-9.30,32.56],[-6.91,34.11],[-5.93,35.76],
+        [-2.17,35.17],[1.47,36.61],[6.26,37.11],[11.03,37.09],[10.34,33.79],[19.09,30.27],
+        [20.05,30.99],[20.13,32.24],[21.54,32.84],[28.91,30.87],[30.98,31.56],[31.96,30.93],
+        [34.27,31.22],[34.92,29.50],[34.15,27.82],[32.42,29.85],[32.73,28.71],[35.69,23.93],
+        [35.53,23.10],[36.87,22.00],[37.48,18.61],[39.27,15.92],[43.32,12.39],[42.72,11.74],
+        [44.61,10.44],[51.13,11.75],[48.59,5.34],[40.26,-2.57],[39.20,-4.68],[38.80,-6.48],
+        [40.48,-10.77],[40.78,-14.69],[39.45,-16.72],[34.79,-19.78],[35.46,-24.12],[32.57,-25.73],
+        [32.20,-28.75],[28.22,-32.77],[25.78,-33.94],[22.57,-33.86],[20.07,-34.80],[18.38,-34.14],
+        [18.22,-31.66],[15.21,-27.09],[14.26,-22.11],[11.79,-18.07],[11.78,-15.79],[13.69,-10.73],
+        [11.91,-5.04],[8.80,-1.11],[9.40,3.73],[8.50,4.77],[5.90,4.26],[4.33,6.27],[-1.96,4.71],
+        [-4.65,5.17],[-7.97,4.36],[-11.44,6.79]
       ];
+      var madagascarPts = [
+        [50.20,-16.00],[49.86,-15.41],[47.10,-24.94],[45.41,-25.60],[44.04,-24.99],[43.25,-22.06],
+        [44.37,-20.07],[44.45,-16.22],[47.71,-14.59],[49.19,-12.04],[50.20,-16.00]
+      ];
+
       var a0 = project(-17, 22), a1 = project(40, -25);
       var africaGrad = ctx.createLinearGradient(a0[0], a0[1], a1[0], a1[1]);
       africaGrad.addColorStop(0, 'rgba(63,169,160,0.72)');
@@ -803,7 +821,7 @@
       ctx.shadowColor = 'rgba(63,169,160,0.85)';
       ctx.shadowBlur = 14;
       drawShape(africaPts, { fill: africaGrad, stroke: '#d4a73a', lineWidth: 2.5 });
-      drawShape([[43,-12],[50,-16],[47,-25],[43,-23],[43,-12]], { fill: africaGrad, stroke: '#d4a73a', lineWidth: 2 }); // Madagascar
+      drawShape(madagascarPts, { fill: africaGrad, stroke: '#d4a73a', lineWidth: 2 });
       ctx.restore();
 
       var tex = new THREE.CanvasTexture(c);
@@ -896,13 +914,16 @@
     startGlobe();
 
     // the microscope/lens slowly sweeps between risk markers on the globe,
-    // surfacing the matching intel card each time it settles
+    // surfacing the matching intel card each time it settles. It runs a full
+    // pass through every point once, then tells the hero slideshow it's done
+    // — the slideshow waits for that signal before advancing.
     var scanLens = document.getElementById('scanLens');
     var intelCard = document.getElementById('intelCard');
     var intelTag = document.getElementById('intelTag');
     var intelText = document.getElementById('intelText');
     var tagColor = { ADVISORY: 'var(--red)', WATCH: 'var(--gold)', CLEAR: 'var(--teal)' };
-    var mi = 0;
+    var pointDwell = 6800; // time spent on each point before moving to the next
+    var running = false;
 
     function sweepTo(m){
       scanLens.style.top = m.pos.top + '%';
@@ -916,13 +937,37 @@
       }, reduceMotion ? 0 : 2600);
     }
 
-    sweepTo(markers[0]);
-    if(!reduceMotion){
-      setInterval(function(){
-        mi = (mi + 1) % markers.length;
-        sweepTo(markers[mi]);
-      }, 9500);
+    function runFullPass(){
+      if(running) return;
+      running = true;
+      var idx = 0;
+      sweepTo(markers[idx]);
+
+      if(reduceMotion){
+        running = false;
+        document.dispatchEvent(new CustomEvent('afGlobeCycleDone'));
+        return;
+      }
+
+      function step(){
+        idx++;
+        if(idx < markers.length){
+          sweepTo(markers[idx]);
+          setTimeout(step, pointDwell);
+        } else {
+          running = false;
+          document.dispatchEvent(new CustomEvent('afGlobeCycleDone'));
+        }
+      }
+      setTimeout(step, pointDwell);
     }
+
+    // start the first pass immediately (page load shows this slide by default),
+    // and again every time the hero slideshow brings this slide back around
+    runFullPass();
+    document.addEventListener('afHeroSlideChanged', function(e){
+      if(e.detail && e.detail.index === 0) runFullPass();
+    });
   })();
 
   // Kenya route map (Travel Security slide) — drawn map blended with the
@@ -1033,9 +1078,11 @@
     let current = 0;
     let timer;
 
-    // dwell time per slide (ms) — slide 0 (globe) and slide 2 (travel route map)
-    // get extra time so their scanning animations have room to play out
-    const dwell = [13000, 6500, 13000, 6500];
+    // dwell time per slide (ms) — slide 2 (travel route map) gets extra time
+    // for its scanning animation. Slide 0 (globe) has no fixed dwell at all:
+    // it only advances once the microscope has visited all 5 points (see the
+    // 'afGlobeCycleDone' listener below).
+    const dwell = [null, 6500, 13000, 6500];
 
     function show(index){
       slides[current].classList.remove('active');
@@ -1043,14 +1090,20 @@
       current = (index + slides.length) % slides.length;
       slides[current].classList.add('active');
       dots[current].classList.add('active');
+      document.dispatchEvent(new CustomEvent('afHeroSlideChanged', { detail: { index: current } }));
     }
     function next(){ show(current + 1); }
     function prev(){ show(current - 1); }
     function startAutoplay(){
       clearTimeout(timer);
-      timer = setTimeout(function(){ next(); startAutoplay(); }, dwell[current] || 6500);
+      if(dwell[current] == null) return; // slide 0 waits for the globe instead
+      timer = setTimeout(function(){ next(); startAutoplay(); }, dwell[current]);
     }
     function resetAutoplay(){ clearTimeout(timer); startAutoplay(); }
+
+    document.addEventListener('afGlobeCycleDone', function(){
+      if(current === 0){ next(); startAutoplay(); }
+    });
 
     dots.forEach((dot, i) => dot.addEventListener('click', () => { show(i); resetAutoplay(); }));
     if(nextBtn) nextBtn.addEventListener('click', () => { next(); resetAutoplay(); });
