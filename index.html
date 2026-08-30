@@ -834,6 +834,8 @@
       var scene = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
       camera.position.set(0, 0, 6.4);
+      camera.updateMatrixWorld(true); // required before any .project(camera) call below —
+                                       // otherwise it uses the camera's stale default matrix
 
       // static group: the Africa map + the risk-marker points never rotate,
       // so the 2D scan lens can reliably land on each one
