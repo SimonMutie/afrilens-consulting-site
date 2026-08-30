@@ -752,11 +752,11 @@
     // each target is that region's rough centroid, so landing "inside" it
     // just means being anywhere in a big shaded area, not hitting a pixel
     var markers = [
-      { name: 'East Africa',      lat: 3.18,   lon: 38.82, tag: 'ADVISORY', text: 'Regional border delays — East Africa corridor', pos: { top: 50, left: 50 } },
-      { name: 'Sahel',            lat: 15.33,  lon: 11.84, tag: 'WATCH',    text: 'Civil unrest indicators elevated — Sahel region', pos: { top: 50, left: 50 } },
-      { name: 'Southern Africa',  lat: -20.14, lon: 23.9,  tag: 'CLEAR',    text: 'Route conditions nominal — Southern Africa corridor', pos: { top: 50, left: 50 } },
-      { name: 'West Africa Coast',lat: 10.45,  lon: 5.25,  tag: 'ADVISORY', text: 'Health notice issued — West African coastal states', pos: { top: 50, left: 50 } },
-      { name: 'Central Africa',   lat: -0.26,  lon: 19.34, tag: 'WATCH',    text: 'Political transition monitored — Central Africa', pos: { top: 50, left: 50 } }
+      { name: 'East Africa',      lat: 3.18,   lon: 38.82, tag: 'ADVISORY', text: 'Regional border delays — East Africa corridor', pos: { top: 50, left: 50 }, nudge: { top: -6, left: -6 } },
+      { name: 'Sahel',            lat: 15.33,  lon: 11.84, tag: 'WATCH',    text: 'Civil unrest indicators elevated — Sahel region', pos: { top: 50, left: 50 }, nudge: { top: -6, left: -6 } },
+      { name: 'Southern Africa',  lat: -20.14, lon: 23.9,  tag: 'CLEAR',    text: 'Route conditions nominal — Southern Africa corridor', pos: { top: 50, left: 50 }, nudge: { top: -6, left: -6 } },
+      { name: 'West Africa Coast',lat: 10.45,  lon: 5.25,  tag: 'ADVISORY', text: 'Health notice issued — West African coastal states', pos: { top: 50, left: 50 }, nudge: { top: -6, left: -6 } },
+      { name: 'Central Africa',   lat: -0.26,  lon: 19.34, tag: 'WATCH',    text: 'Political transition monitored — Central Africa', pos: { top: 50, left: 50 }, nudge: { top: -6, left: 0 } }
     ];
 
     function buildMapTexture(){
@@ -921,8 +921,9 @@
         var canvasPctX = (screenPos.x * 0.5 + 0.5) * 100;
         var canvasPctY = (1 - (screenPos.y * 0.5 + 0.5)) * 100;
         // the canvas itself sits inset 6% within .globe-box (see .globe-canvas-wrap)
-        m.pos.left = 6 + canvasPctX * 0.88;
-        m.pos.top = 6 + canvasPctY * 0.88;
+        var nudge = m.nudge || { top: 0, left: 0 };
+        m.pos.left = 6 + canvasPctX * 0.88 + nudge.left;
+        m.pos.top = 6 + canvasPctY * 0.88 + nudge.top;
       });
 
       // the wireframe shell spins on its own — purely a visual "the globe
