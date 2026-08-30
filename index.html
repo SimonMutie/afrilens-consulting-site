@@ -215,10 +215,6 @@
     max-width:440px;
     aspect-ratio:1/1;
     margin:0 auto;
-    border-radius:14px;
-    overflow:hidden;
-    border:1px solid var(--line);
-    box-shadow:0 0 44px rgba(63,169,160,0.10);
   }
   .kenya-map-svg{ position:absolute; inset:0; width:100%; height:100%; display:block; }
   .kenya-map-box .route-svg{ inset:0; }
@@ -747,6 +743,7 @@
   // Real 3D rotating globe + scanning-lens marker sweep (hero, slide 1)
   (function(){
     var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var firstBuildDone = false;
     var canvas = document.getElementById('alGlobeCanvas');
     var wrap = canvas ? canvas.parentElement : null;
     if(!canvas || !wrap || typeof THREE === 'undefined') return;
@@ -872,6 +869,17 @@
         );
         dot.position.set(p.x, p.y, 0.02);
         staticGroup.add(dot);
+
+        // project the dot's real 3D position through the camera to get its
+        // actual on-screen spot, so the scan lens always lands exactly on it
+        // rather than an eyeballed guess. The projection is resolution-
+        // independent (percentages), so it only needs to run once.
+        var screenPos = dot.position.clone().project(camera);
+        var canvasPctX = (screenPos.x * 0.5 + 0.5) * 100;
+        var canvasPctY = (1 - (screenPos.y * 0.5 + 0.5)) * 100;
+        // the canvas itself sits inset 6% within .globe-box (see .globe-canvas-wrap)
+        m.pos.left = 6 + canvasPctX * 0.88;
+        m.pos.top = 6 + canvasPctY * 0.88;
       });
 
       // the wireframe shell spins on its own — purely a visual "the globe
@@ -896,6 +904,8 @@
         camera.aspect = 1;
         camera.updateProjectionMatrix();
       });
+
+      if(!firstBuildDone){ firstBuildDone = true; runFullPass(); }
     }
 
     function startGlobe(){
@@ -911,12 +921,13 @@
       }
       buildGlobe(size);
     }
-    startGlobe();
 
     // the microscope/lens slowly sweeps between risk markers on the globe,
     // surfacing the matching intel card each time it settles. It runs a full
     // pass through every point once, then tells the hero slideshow it's done
-    // — the slideshow waits for that signal before advancing.
+    // — the slideshow waits for that signal before advancing. These need to
+    // exist before startGlobe() runs, since buildGlobe can call runFullPass()
+    // synchronously as soon as marker positions are computed.
     var scanLens = document.getElementById('scanLens');
     var intelCard = document.getElementById('intelCard');
     var intelTag = document.getElementById('intelTag');
@@ -962,9 +973,11 @@
       setTimeout(step, pointDwell);
     }
 
-    // start the first pass immediately (page load shows this slide by default),
-    // and again every time the hero slideshow brings this slide back around
-    runFullPass();
+    startGlobe();
+
+    // the first pass is triggered from inside buildGlobe once marker screen
+    // positions are actually known; this just handles every subsequent time
+    // the hero slideshow brings this slide back around
     document.addEventListener('afHeroSlideChanged', function(e){
       if(e.detail && e.detail.index === 0) runFullPass();
     });
@@ -982,24 +995,19 @@
 
     svg.innerHTML =
       '<defs>' +
-        '<linearGradient id="kenyaBg" x1="0" y1="0" x2="1" y2="1">' +
-          '<stop offset="0" stop-color="#1a2540"/>' +
-          '<stop offset="1" stop-color="#0b1220"/>' +
-        '</linearGradient>' +
         '<linearGradient id="kenyaFill" x1="0" y1="0" x2="1" y2="1">' +
-          '<stop offset="0" stop-color="#3fa9a0" stop-opacity="0.55"/>' +
-          '<stop offset="1" stop-color="#d4a73a" stop-opacity="0.4"/>' +
+          '<stop offset="0" stop-color="#3fa9a0" stop-opacity="0.6"/>' +
+          '<stop offset="1" stop-color="#d4a73a" stop-opacity="0.45"/>' +
         '</linearGradient>' +
       '</defs>' +
-      '<rect x="0" y="0" width="100" height="100" fill="url(#kenyaBg)"/>' +
-      '<g stroke="rgba(212,167,58,0.08)" stroke-width="0.4">' +
+      '<g stroke="rgba(212,167,58,0.1)" stroke-width="0.4">' +
         '<line x1="0" y1="20" x2="100" y2="20"/><line x1="0" y1="40" x2="100" y2="40"/>' +
         '<line x1="0" y1="60" x2="100" y2="60"/><line x1="0" y1="80" x2="100" y2="80"/>' +
         '<line x1="20" y1="0" x2="20" y2="100"/><line x1="40" y1="0" x2="40" y2="100"/>' +
         '<line x1="60" y1="0" x2="60" y2="100"/><line x1="80" y1="0" x2="80" y2="100"/>' +
       '</g>' +
       '<polygon points="' + kenyaOutline + '" fill="url(#kenyaFill)" stroke="#d4a73a" stroke-width="1" ' +
-        'style="filter:drop-shadow(0 0 4px rgba(63,169,160,0.6))"/>';
+        'style="filter:drop-shadow(0 0 5px rgba(63,169,160,0.7))"/>';
 
     // waypoints along the convoy loop — positions are in the same 0–100 space as the SVG viewBox
     var waypoints = [
