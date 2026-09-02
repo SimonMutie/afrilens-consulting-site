@@ -101,7 +101,7 @@
   }
   .hero-inner{
     position:relative; z-index:2;
-    display:grid; grid-template-columns:1.1fr minmax(300px, 0.9fr); gap:60px; align-items:center;
+    display:grid; grid-template-columns:1.1fr 0.9fr; gap:60px; align-items:center;
     max-width:1180px; margin:0 auto; padding:0 32px 90px;
   }
   @media(max-width:900px){ .hero-inner{grid-template-columns:1fr;} }
@@ -127,115 +127,61 @@
   .btn-ghost:hover{border-color:var(--teal); color:var(--teal); transform:translateY(-2px);}
   /* Rotating 3D globe + scanning lens (Overview slide) */
   .globe-box{
-    position:relative;
-    width:100%;
-    min-width:300px;
-    max-width:560px;
-    aspect-ratio:1/1;
-    margin:0 auto;
+    position:relative; width:100%; aspect-ratio:1/1; max-width:440px; margin:0 auto;
+    perspective:900px;
   }
-  .globe-canvas-wrap{
-    position:absolute; inset:6%; border-radius:50%; overflow:visible;
+  .globe-fill{
+    position:absolute; inset:6%; border-radius:50%;
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.16), transparent 45%),
+      radial-gradient(circle at 68% 78%, rgba(0,0,0,0.4), transparent 60%),
+      linear-gradient(135deg, var(--panel-2), var(--navy));
+    box-shadow:
+      inset -20px -20px 44px rgba(0,0,0,0.5),
+      inset 12px 12px 28px rgba(255,255,255,0.05),
+      0 0 44px rgba(63,169,160,0.10);
   }
-  .globe-canvas-wrap canvas{
-    width:100% !important; height:100% !important; display:block;
+  .globe-wire{
+    position:absolute; inset:6%;
+    transform-style:preserve-3d;
+    animation:globeSpin3d 9s linear infinite;
   }
-  .globe-glow{
-    position:absolute; inset:6%; border-radius:50%; pointer-events:none;
-    box-shadow:0 0 60px rgba(63,169,160,0.14);
+  .meridian{
+    position:absolute; inset:0; border:1px solid rgba(154,166,189,0.55); border-radius:50%;
   }
-  /* the microscope/lens on the globe slide — top/left set by JS, sweeps slowly between markers */
+  @keyframes globeSpin3d{
+    from{ transform:rotateY(0deg); }
+    to{ transform:rotateY(360deg); }
+  }
+  .latitude{
+    position:absolute; left:3%; right:3%; border:1px solid rgba(154,166,189,0.35); border-radius:50%;
+  }
   .scan-lens{
-    position:absolute; width:9%; height:9%; top:38%; left:6%; z-index:3;
-    transition: top 3.2s cubic-bezier(.45,0,.2,1), left 3.2s cubic-bezier(.45,0,.2,1);
+    position:absolute; width:32%; height:32%; top:32%; left:6%; z-index:3;
+    animation:scanSweep 6s ease-in-out infinite;
   }
   .scan-glass{
     position:absolute; inset:0; border-radius:50%;
-    border: 2px solid transparent;
-    background:
-      radial-gradient(circle at 32% 26%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.14) 28%, rgba(255,255,255,0.04) 60%, rgba(255,255,255,0) 100%) padding-box,
-      linear-gradient(135deg, #f2f4f6, #aab2ba) border-box;
-    background-clip: padding-box, border-box;
-    box-shadow:
-      inset 0 0 8px rgba(255,255,255,0.4),
-      0 0 3px rgba(255,255,255,0.75),
-      0 0 14px rgba(255,255,255,0.35),
-      0 0 26px rgba(255,255,255,0.15);
-  }
-  .scan-glass::after{
-    content:"";
-    position:absolute; top:16%; left:20%; width:26%; height:16%;
-    background:rgba(255,255,255,0.85);
-    border-radius:50%;
-    filter:blur(1px);
-    transform:rotate(-32deg);
-    pointer-events:none;
+    border:5px solid rgba(237,239,242,0.9);
+    background:rgba(237,239,242,0.06);
+    box-shadow:0 0 0 6px rgba(212,167,58,0.2), 0 4px 18px rgba(0,0,0,0.45);
   }
   .scan-handle{
-    position:absolute; width:4px; height:24px; border-radius:3px;
-    background:linear-gradient(180deg, #f2f4f6 0%, #c3cad1 55%, #7d868f 100%);
-    box-shadow:0 1px 2px rgba(0,0,0,0.45);
-    bottom:-16px; right:-1px; transform:rotate(45deg); transform-origin:top center;
+    position:absolute; width:7px; height:44px; border-radius:4px;
+    background:rgba(237,239,242,0.9);
+    bottom:-30px; right:-2px; transform:rotate(45deg); transform-origin:top center;
   }
-
-  /* --- reusable building blocks for an interactive route map (used on the Travel Security slide) --- */
-  .route-svg{
-    position:absolute; inset:6%; pointer-events:none; z-index:2;
-    overflow:visible;
+  @keyframes scanSweep{
+    0%{ left:4%; }
+    50%{ left:62%; }
+    100%{ left:4%; }
   }
-  .route-svg polyline{
-    fill:none;
-    stroke:rgba(63,169,160,0.5);
-    stroke-width:0.6;
-    stroke-dasharray:2.2 2.2;
-  }
-  .node-hit{
-    position:absolute; width:22px; height:22px; margin:-11px 0 0 -11px;
-    border-radius:50%; border:1px solid rgba(63,169,160,0.5);
-    background:rgba(19,27,46,0.4);
-    cursor:pointer; z-index:3;
-    transition:transform .25s ease, border-color .25s ease, background .25s ease;
-  }
-  .node-hit:hover{ transform:scale(1.35); border-color:var(--gold); background:rgba(212,167,58,0.18); }
-  .node-hit:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
-  /* the analyst figure — position (top/left) set by JS as it travels between route nodes */
-  .scan-figure{
-    position:absolute; width:15%; height:15%; top:38%; left:6%; z-index:4;
-    transform:translate(-50%, -50%);
-    transition: top 3s cubic-bezier(.45,0,.2,1), left 3s cubic-bezier(.45,0,.2,1);
-    filter: drop-shadow(0 0 6px rgba(63,169,160,0.65));
-  }
-  .scan-figure svg{ width:100%; height:100%; display:block; }
-  .intel-card{
-    position:absolute; bottom:-52px; left:50%; transform:translate(-50%, 8px);
-    width:max(230px, 88%); background:var(--panel); border:1px solid var(--line);
-    border-radius:6px; padding:10px 14px; opacity:0; z-index:5;
-    transition:opacity .8s ease, transform .8s ease;
-    pointer-events:none;
-  }
-  .intel-card.show{ opacity:1; transform:translate(-50%, 0); }
-  .intel-tag{font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:700; letter-spacing:0.06em; margin-bottom:3px;}
-  .intel-text{font-size:12.5px; color:var(--text-dim); line-height:1.4;}
 
   .radar-label{
     position:absolute; bottom:-40px; left:50%; transform:translateX(-50%);
     font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-dim);
     letter-spacing:0.06em; text-align:center; width:100%; max-width:340px;
   }
-  .globe-box .radar-label{ bottom:-100px; }
-
-  /* Kenya / travel-security route map */
-  .kenya-map-box{
-    position:relative;
-    width:100%;
-    min-width:260px;
-    max-width:440px;
-    aspect-ratio:1/1;
-    margin:0 auto;
-  }
-  .kenya-map-svg{ position:absolute; inset:0; width:100%; height:100%; display:block; }
-  .kenya-map-box .route-svg{ inset:0; }
-  .kenya-map-box .radar-label{ bottom:-40px; }
 
   /* Hero slideshow */
   .hero-slides{position:relative; z-index:2;}
@@ -258,7 +204,7 @@
   .dot.active{background:var(--gold); transform:scale(1.35);}
 
   /* Pulse graphic (Monitor & Report slide) */
-  .pulse-box{position:relative; aspect-ratio:1/1; max-width:440px; margin:0 auto; display:flex; align-items:center; justify-content:center;}
+  .pulse-box{position:relative; width:100%; aspect-ratio:1/1; max-width:440px; margin:0 auto; display:flex; align-items:center; justify-content:center;}
   .pulse-ring{position:absolute; border:1px solid rgba(212,167,58,0.4); border-radius:50%; animation:pulseExpand 3s ease-out infinite;}
   .pulse-ring.pr1{width:36%; height:36%; animation-delay:0s;}
   .pulse-ring.pr2{width:62%; height:62%; animation-delay:1s;}
@@ -274,11 +220,20 @@
     background:var(--gold); opacity:0.8;
   }
 
-  /* Route map (Travel Security slide) */
-  .route-graphic{position:relative; max-width:440px; margin:0 auto;}
+  /* Route map photo (Travel Security slide) */
+  .route-graphic{position:relative; width:100%; max-width:440px; margin:0 auto;}
+  .route-photo{
+    position:relative; aspect-ratio:1/1;
+    border-radius:12px; overflow:hidden;
+    border:1px solid var(--line);
+    box-shadow:0 0 44px rgba(63,169,160,0.10);
+  }
+  .route-photo img{
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
 
   /* Lens graphic (The Lens slide) */
-  .lens-box{position:relative; aspect-ratio:1/1; max-width:440px; margin:0 auto; overflow:hidden; border-radius:12px;}
+  .lens-box{position:relative; width:100%; aspect-ratio:1/1; max-width:440px; margin:0 auto; overflow:hidden; border-radius:12px;}
   .data-grid{
     position:absolute; inset:8%;
     background-image:radial-gradient(rgba(154,166,189,0.4) 1.5px, transparent 1.5px);
@@ -330,6 +285,10 @@
   .intro-band .wrap{padding-top:90px; padding-bottom:90px;}
   .intro-band h2{font-size:clamp(24px,3vw,34px); max-width:820px; margin-bottom:22px;}
   .intro-band p{color:var(--text-dim); max-width:760px; font-size:16px; margin-bottom:14px;}
+  .about-grid{display:grid; grid-template-columns:1.15fr 0.85fr; gap:60px; align-items:center;}
+  @media(max-width:900px){.about-grid{grid-template-columns:1fr;}}
+  .about-logo{display:flex; align-items:center; justify-content:center;}
+  .about-logo img{width:100%; max-width:380px; display:block;}
 
   .card-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:26px;}
   @media(max-width:900px){.card-grid{grid-template-columns:1fr;}}
@@ -413,8 +372,7 @@
   .footer-bottom{display:flex; justify-content:space-between; flex-wrap:wrap; gap:14px; color:var(--text-dim); font-size:13px; font-family:'IBM Plex Mono',monospace;}
 
   @media (prefers-reduced-motion: reduce){
-    .pulse-ring, .lens-unit, .ticker-track{animation:none !important;}
-    .scan-figure, .scan-lens{transition:none !important;}
+    .globe-wire, .scan-lens, .pulse-ring, .lens-unit, .ticker-track{animation:none !important;}
   }
 </style>
 </head>
@@ -424,8 +382,11 @@
   <nav class="wrap">
     <div class="logo"><img src="afrilens-logo.png" alt="AfriLens" class="logo-img"></div>
     <div class="navlinks">
+      <a href="#about">About</a>
       <a href="#sis">Security Information</a>
       <a href="#tss">Travel Security</a>
+      <a href="#cid">Diligence</a>
+      <a href="#cio">Investigations</a>
       <a href="#why">Why AfriLens</a>
       <a href="https://thelens.afrilensconsulting.com/" target="_blank" rel="noopener noreferrer">The Lens</a>
       <a href="#contact">Contact</a>
@@ -451,18 +412,22 @@
             <a href="#sis" class="btn btn-ghost">VIEW CAPABILITIES</a>
           </div>
         </div>
-        <div class="globe-box" id="globeBox">
-          <div class="globe-canvas-wrap">
-            <canvas id="alGlobeCanvas"></canvas>
+        <div class="globe-box">
+          <div class="globe-fill"></div>
+          <div class="globe-wire">
+            <div class="meridian" style="transform:rotateY(0deg);"></div>
+            <div class="meridian" style="transform:rotateY(30deg);"></div>
+            <div class="meridian" style="transform:rotateY(60deg);"></div>
+            <div class="meridian" style="transform:rotateY(90deg);"></div>
+            <div class="meridian" style="transform:rotateY(120deg);"></div>
+            <div class="meridian" style="transform:rotateY(150deg);"></div>
+            <div class="latitude" style="top:10%; height:12%;"></div>
+            <div class="latitude" style="top:44%; height:12%;"></div>
+            <div class="latitude" style="bottom:10%; height:12%;"></div>
           </div>
-          <div class="globe-glow"></div>
-          <div class="scan-lens" id="scanLens">
+          <div class="scan-lens">
             <div class="scan-glass"></div>
             <div class="scan-handle"></div>
-          </div>
-          <div class="intel-card" id="intelCard">
-            <div class="intel-tag" id="intelTag">ADVISORY</div>
-            <div class="intel-text" id="intelText">Regional border delays — East Africa corridor</div>
           </div>
           <div class="radar-label mono">SCANNING 54 MARKETS · ENABLING YOUR RISK ANTICIPATION AND MITIGATION</div>
         </div>
@@ -502,24 +467,8 @@
           </div>
         </div>
         <div class="route-graphic">
-          <div class="kenya-map-box" id="kenyaMapBox">
-            <svg class="kenya-map-svg" id="kenyaMapSvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"></svg>
-            <svg class="route-svg" id="kenyaRouteSvg" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <polyline id="kenyaRouteLine" points=""></polyline>
-            </svg>
-            <div id="kenyaNodeHits"></div>
-            <div class="scan-figure" id="kenyaScanFigure">
-              <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="8" cy="5" r="2" stroke="#D4A73A" stroke-width="1.4"></circle>
-                <path d="M8 7 L8 14 M8 14 L5.2 20 M8 14 L10.4 19.5 M8 9.5 L14 9.5" stroke="#D4A73A" stroke-width="1.4"></path>
-                <circle cx="17.2" cy="9.5" r="3.1" stroke="#3FA9A0" stroke-width="1.5" fill="rgba(63,169,160,0.14)"></circle>
-                <path d="M19.4 11.7 L21.3 13.6" stroke="#3FA9A0" stroke-width="1.5"></path>
-              </svg>
-            </div>
-            <div class="intel-card" id="kenyaIntelCard">
-              <div class="intel-tag" id="kenyaIntelTag">CLEAR</div>
-              <div class="intel-text" id="kenyaIntelText">Convoy staging point — cleared for departure</div>
-            </div>
+          <div class="route-photo">
+            <img src="travel-security-map.png" alt="Route planning and live tracking map across East Africa">
           </div>
           <div class="radar-label mono">ROUTE PLANNING &amp; LIVE TRACKING — WE ACCOMPANY YOU EVERY STEP OF THE WAY</div>
         </div>
@@ -571,12 +520,17 @@
   </div>
 </section>
 
-<div class="intro-band">
-  <div class="wrap">
-    <div class="eyebrow">SITREP · OVERVIEW</div>
-    <h2>Security, simplified for a continent in motion.</h2>
-    <p>AfriLens specializes in synthesized security information and travel security services for organizations operating across Africa — turning a fast-moving landscape of political, security, and health risk into clear, actionable intelligence.</p>
-    <p>We help protect your people and operations through proactive monitoring, tailored assessments, and journey support built specifically for African conditions.</p>
+<div class="intro-band" id="about">
+  <div class="wrap about-grid">
+    <div>
+      <div class="eyebrow">ABOUT AFRILENS</div>
+      <h2>Local ground truth, delivered to global standards.</h2>
+      <p>AfriLens is a security and risk intelligence firm operating across sub-Saharan Africa, specializing in security information services, travel security, commercial and investment diligence, corporate oversight investigations, and geopolitical risk management. We build tailored solutions for the specific risk concerns of multinational businesses, investors, financial institutions, and humanitarian and non-profit organizations.</p>
+      <p>AfriLens clients gain access to a vetted, discreet network of analysts, investigators, and on-the-ground specialists — turning local knowledge and real-time signals into clear, evidence-based intelligence for the decisions that matter most.</p>
+    </div>
+    <div class="about-logo">
+      <img src="afrilens-logo.png" alt="AfriLens">
+    </div>
   </div>
 </div>
 
@@ -596,12 +550,12 @@
       <div class="card">
         <span class="card-num mono">[ REPORT ]</span>
         <h3>Intelligence Reporting</h3>
-        <p>Daily, weekly, monthly, and annual briefings that go beyond the headline — contextualized analysis of security, political, and health trends to support long-term planning.</p>
+        <p>Daily, weekly, monthly, and annual briefings — plus bespoke geopolitical risk indicators built around your organization or sector. We track shifts in political, economic, regulatory, and social policy across African markets and translate them into evidence your leadership and board can act on.</p>
       </div>
       <div class="card">
         <span class="card-num mono">[ ASSESS ]</span>
         <h3>Bespoke Assessments</h3>
-        <p>Focused briefs on a specific concern — a regional flashpoint, a single site, a single trip — with analysis and recommendations sized to the decision in front of you.</p>
+        <p>Focused analysis on the flashpoint in front of you — an election, civil unrest, a single site, a single trip — sized for medium- and long-term planning, and delivered as board- and investor-ready briefing packets when the stakes call for it.</p>
       </div>
       <div class="card card--featured" id="lens-card">
         <span class="card-num mono">[ ACCESS ]</span>
@@ -653,6 +607,88 @@
             <li><b>Multi-layered tracking</b> — real-time device and platform monitoring of vehicles and personnel.</li>
             <li><b>Secure communication protocols</b> — clear, tested coordination between your team and ours.</li>
             <li><b>Emergency response services</b> — accident management, medical support, and rapid escalation when it matters.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cid">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">CAPABILITY 03</div>
+      <h2>Commercial &amp; Investment Diligence</h2>
+      <p>Ground truth for capital at risk — verified before you commit, not after.</p>
+    </div>
+    <div class="tabs-wrap">
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-tab="d1">Site &amp; Asset Verification <span class="mono">01</span></button>
+        <button class="tab-btn" data-tab="d2">Entity &amp; Person Screening <span class="mono">02</span></button>
+        <button class="tab-btn" data-tab="d3">Market Entry &amp; Expansion <span class="mono">03</span></button>
+      </div>
+      <div>
+        <div class="tab-panel active" id="d1">
+          <h4>Confirming what's actually on the ground</h4>
+          <ul>
+            <li><b>Independent site validation</b> — on-the-ground confirmation of remote assets, project locations, and infrastructure before funds are committed.</li>
+            <li><b>Administrative presence checks</b> — verification that the operations, staff, or facilities a deal depends on actually exist as described.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="d2">
+          <h4>Diligence that goes past the paper trail</h4>
+          <ul>
+            <li><b>Criminal, legal &amp; reputational screening</b> — checks on key individuals and counterparties to surface risk history before it becomes your risk.</li>
+            <li><b>Political exposure analysis</b> — identifying ties that could shape a counterparty's risk profile or regulatory standing.</li>
+            <li><b>Leadership &amp; governance review</b> — a full read on a company's governance structure, ownership, and commercial relationships.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="d3">
+          <h4>Built for capital moving into new ground</h4>
+          <ul>
+            <li><b>Market entry &amp; feasibility studies</b> — stakeholder mapping and on-the-ground assessment ahead of a new-market decision.</li>
+            <li><b>Expansion advisory &amp; compliance mapping</b> — validation support and regulatory guidance for corporate expansion and personnel relocation.</li>
+            <li><b>Transaction support</b> — findings sized to inform deal terms, at any funding stage, through to M&amp;A validation.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cio" style="background:var(--panel); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">CAPABILITY 04</div>
+      <h2>Corporate Intelligence &amp; Oversight Investigations</h2>
+      <p>Independent answers when the stakes are internal — misconduct, exposure, and the truth behind the numbers.</p>
+    </div>
+    <div class="tabs-wrap">
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-tab="o1">Workplace &amp; Misconduct <span class="mono">01</span></button>
+        <button class="tab-btn" data-tab="o2">Digital Forensics &amp; Evidence <span class="mono">02</span></button>
+        <button class="tab-btn" data-tab="o3">Corporate &amp; Competitive Intelligence <span class="mono">03</span></button>
+      </div>
+      <div>
+        <div class="tab-panel active" id="o1">
+          <h4>Investigations built for sensitive ground</h4>
+          <ul>
+            <li><b>Overt &amp; discreet investigations</b> — into administrative misconduct and workplace issues, scaled to the sensitivity of the case.</li>
+            <li><b>Prosecutorial support &amp; evidence management</b> — comprehensive case support for matters serious enough to go the distance.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="o2">
+          <h4>Findings that hold up under scrutiny</h4>
+          <ul>
+            <li><b>Digital &amp; forensic investigations</b> — advanced open-source and cyber toolkits to identify, preserve, and examine digital evidence.</li>
+            <li><b>Penetration testing &amp; vulnerability audits</b> — bespoke testing across reputational, legal, and IT exposure.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="o3">
+          <h4>The outside view, built to inform decisions</h4>
+          <ul>
+            <li><b>Competitor &amp; business intelligence</b> — open-source collection, digital research, and key informant interviews behind every report.</li>
+            <li><b>Reputational risk &amp; market entry analysis</b> — intelligence support across reputational management, market entry, and other commercial priorities.</li>
           </ul>
         </div>
       </div>
@@ -733,9 +769,12 @@
         <a href="#sis">Intelligence Reporting</a>
         <a href="#tss">Journey Management</a>
         <a href="#tss">Convoy Escorts</a>
+        <a href="#cid">Investment Diligence</a>
+        <a href="#cio">Corporate Investigations</a>
       </div>
       <div class="footer-col">
         <h5>Company</h5>
+        <a href="#about">About</a>
         <a href="#why">Why AfriLens</a>
         <a href="#contact">Contact</a>
       </div>
@@ -753,389 +792,8 @@
   </div>
 </footer>
 
-<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
-
-  // Real 3D rotating globe + scanning-lens marker sweep (hero, slide 1)
-  (function(){
-    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var firstBuildDone = false;
-    var canvas = document.getElementById('alGlobeCanvas');
-    var wrap = canvas ? canvas.parentElement : null;
-    if(!canvas || !wrap || typeof THREE === 'undefined') return;
-
-    // 5 subregions, shaded directly on the map instead of pin-point dots —
-    // each target is that region's rough centroid, so landing "inside" it
-    // just means being anywhere in a big shaded area, not hitting a pixel
-    var markers = [
-      { name: 'East Africa',      lat: 3.18,   lon: 38.82, tag: 'ADVISORY', text: 'Regional border delays — East Africa corridor', pos: { top: 50, left: 50 }, nudge: { top: -6, left: -6 } },
-      { name: 'Sahel',            lat: 15.33,  lon: 11.84, tag: 'WATCH',    text: 'Civil unrest indicators elevated — Sahel region', pos: { top: 50, left: 50 }, nudge: { top: -6, left: -6 } },
-      { name: 'Southern Africa',  lat: -20.14, lon: 23.9,  tag: 'CLEAR',    text: 'Route conditions nominal — Southern Africa corridor', pos: { top: 50, left: 50 }, nudge: { top: -6, left: -6 } },
-      { name: 'West Africa Coast',lat: 10.45,  lon: 5.25,  tag: 'ADVISORY', text: 'Health notice issued — West African coastal states', pos: { top: 50, left: 50 }, nudge: { top: -4, left: -12 } },
-      { name: 'Central Africa',   lat: -0.26,  lon: 19.34, tag: 'WATCH',    text: 'Political transition monitored — Central Africa', pos: { top: 50, left: 50 }, nudge: { top: -6, left: -4 } }
-    ];
-
-    function buildMapTexture(){
-      // tight bounding box around Africa only — canvas stays transparent
-      // everywhere else, so the texture reads as a floating cutout shape,
-      // not a rectangular card
-      var lonMin = -20, lonMax = 54, latMin = -38, latMax = 40;
-      var w = 640, h = Math.round(640 * (latMax - latMin) / (lonMax - lonMin));
-      var c = document.createElement('canvas');
-      c.width = w; c.height = h;
-      var ctx = c.getContext('2d');
-
-      function project(lon, lat) {
-        return [
-          (lon - lonMin) / (lonMax - lonMin) * w,
-          (latMax - lat) / (latMax - latMin) * h
-        ];
-      }
-
-      function pathFor(points) {
-        ctx.beginPath();
-        points.forEach(function (p, i) {
-          var xy = project(p[0], p[1]);
-          if (i === 0) ctx.moveTo(xy[0], xy[1]); else ctx.lineTo(xy[0], xy[1]);
-        });
-        ctx.closePath();
-      }
-
-      function drawShape(points, opts) {
-        pathFor(points);
-        if (opts.fill) { ctx.fillStyle = opts.fill; ctx.fill(); }
-        if (opts.stroke) { ctx.lineWidth = opts.lineWidth || 1; ctx.strokeStyle = opts.stroke; ctx.stroke(); }
-      }
-
-      function rgba(hex, a) {
-        var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-        return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
-      }
-
-      // real coastline — derived from Natural Earth's public-domain admin-0
-      // country boundaries (all African countries merged into one outline),
-      // simplified from ~9,000 points down to these ~80 while preserving
-      // the actual shape, rather than a freehand approximation
-      var africaPts = [
-        [-11.44,6.79],[-16.61,12.17],[-17.63,14.73],[-16.27,17.17],[-16.28,20.09],[-17.06,21.00],
-        [-15.98,23.72],[-13.14,27.64],[-9.56,29.93],[-9.30,32.56],[-6.91,34.11],[-5.93,35.76],
-        [-2.17,35.17],[1.47,36.61],[6.26,37.11],[11.03,37.09],[10.34,33.79],[19.09,30.27],
-        [20.05,30.99],[20.13,32.24],[21.54,32.84],[28.91,30.87],[30.98,31.56],[31.96,30.93],
-        [34.27,31.22],[34.92,29.50],[34.15,27.82],[32.42,29.85],[32.73,28.71],[35.69,23.93],
-        [35.53,23.10],[36.87,22.00],[37.48,18.61],[39.27,15.92],[43.32,12.39],[42.72,11.74],
-        [44.61,10.44],[51.13,11.75],[48.59,5.34],[40.26,-2.57],[39.20,-4.68],[38.80,-6.48],
-        [40.48,-10.77],[40.78,-14.69],[39.45,-16.72],[34.79,-19.78],[35.46,-24.12],[32.57,-25.73],
-        [32.20,-28.75],[28.22,-32.77],[25.78,-33.94],[22.57,-33.86],[20.07,-34.80],[18.38,-34.14],
-        [18.22,-31.66],[15.21,-27.09],[14.26,-22.11],[11.79,-18.07],[11.78,-15.79],[13.69,-10.73],
-        [11.91,-5.04],[8.80,-1.11],[9.40,3.73],[8.50,4.77],[5.90,4.26],[4.33,6.27],[-1.96,4.71],
-        [-4.65,5.17],[-7.97,4.36],[-11.44,6.79]
-      ];
-      var madagascarPts = [
-        [50.20,-16.00],[49.86,-15.41],[47.10,-24.94],[45.41,-25.60],[44.04,-24.99],[43.25,-22.06],
-        [44.37,-20.07],[44.45,-16.22],[47.71,-14.59],[49.19,-12.04],[50.20,-16.00]
-      ];
-
-      // 5 subregions, shaded in distinct colors so the scanning lens has a
-      // large, forgiving area to land on rather than a single pixel. Each
-      // shape here is real country geometry (from the same Natural Earth
-      // dataset as the coastline above) with national borders merged away
-      // within each group and simplified — so the color boundaries follow
-      // actual borders rather than straight rectangle cuts. Colors are
-      // drawn from (or blended between) the site's own gold/red/teal
-      // accents, so the palette still matches the rest of the page.
-      var regionShapes = [
-        { color: '#D4A73A', pts: [ // Sahel
-          [29.72,4.6],[27.98,4.41],[25.11,7.83],[23.46,8.95],[23.55,10.09],[22.86,11.14],[21.72,10.57],[21.0,9.48],[18.81,8.98],[18.91,8.63],[17.96,7.89],[15.28,7.42],[14.98,8.8],[13.95,9.55],[14.17,10.02],[15.47,9.98],[14.92,10.89],[14.89,12.22],[14.5,12.86],[14.0,12.46],[13.08,13.6],[12.3,13.04],[10.99,13.39],[9.01,12.83],[7.8,13.34],[6.82,13.12],[5.44,13.87],[4.37,13.75],[3.61,11.66],[2.49,12.23],[0.9,11.0],[-2.94,10.96],[-2.83,9.64],[-3.51,9.9],[-4.33,9.61],[-5.4,10.37],[-6.05,10.1],[-6.21,10.52],[-6.85,10.14],[-8.03,10.21],[-9.13,12.31],[-10.17,11.84],[-11.46,12.08],[-12.17,14.62],[-13.44,16.04],[-14.58,16.6],[-16.46,16.14],[-16.28,20.09],[-17.06,21.0],[-16.85,21.33],[-12.93,21.33],[-12.87,23.28],[-11.94,23.37],[-11.97,25.93],[-8.69,25.88],[-8.68,27.4],[3.15,19.69],[3.16,19.06],[5.68,19.6],[12.0,23.47],[13.58,23.04],[14.14,22.49],[15.86,23.41],[23.84,19.58],[23.85,20.0],[25.0,20.0],[25.0,22.0],[36.87,22.0],[37.48,18.61],[38.41,18.0],[36.85,16.96],[35.86,12.58],[34.26,10.63],[33.83,8.38],[33.29,8.35],[32.95,7.78],[34.08,7.23],[35.3,5.51],[33.39,3.79],[30.83,3.51],[29.72,4.6]
-        ]},
-        { color: '#E08E45', pts: [ // West Africa Coast
-          [-7.97,4.36],[-12.43,7.26],[-14.84,10.88],[-16.61,12.17],[-16.71,13.59],[-17.63,14.73],[-16.12,16.46],[-14.58,16.6],[-13.44,16.04],[-12.17,14.62],[-11.46,12.08],[-10.17,11.84],[-9.13,12.31],[-8.03,10.21],[-6.85,10.14],[-6.21,10.52],[-6.05,10.1],[-5.4,10.37],[-4.33,9.61],[-3.51,9.9],[-2.83,9.64],[-2.94,10.96],[0.9,11.0],[2.49,12.23],[3.61,11.66],[4.37,13.75],[5.44,13.87],[6.82,13.12],[7.8,13.34],[9.01,12.83],[10.99,13.39],[12.3,13.04],[13.08,13.6],[14.58,12.09],[13.57,10.8],[11.75,6.98],[11.06,6.64],[10.12,7.04],[9.23,6.44],[8.5,4.77],[7.46,4.41],[5.9,4.26],[4.33,6.27],[1.87,6.14],[-1.96,4.71],[-4.65,5.17],[-7.97,4.36]
-        ]},
-        { color: '#5C7AA0', pts: [ // Central Africa
-          [29.42,-5.94],[30.74,-8.34],[28.73,-8.53],[28.37,-11.79],[29.34,-12.36],[29.62,-12.18],[29.7,-13.26],[28.93,-13.25],[27.16,-11.61],[26.55,-11.92],[24.31,-11.26],[24.26,-10.95],[22.16,-11.08],[21.73,-7.29],[20.51,-7.3],[20.6,-6.94],[20.09,-6.94],[19.42,-7.16],[19.02,-7.99],[17.47,-8.07],[16.33,-5.88],[12.32,-6.1],[12.18,-5.79],[13.0,-4.78],[12.62,-4.44],[11.91,-5.04],[8.8,-1.11],[9.8,3.07],[8.5,4.77],[9.23,6.44],[10.12,7.04],[11.06,6.64],[11.75,6.98],[13.57,10.8],[14.42,11.57],[14.21,12.8],[14.89,12.22],[14.92,10.89],[15.47,9.98],[14.17,10.02],[13.95,9.55],[14.98,8.8],[15.28,7.42],[17.96,7.89],[18.91,8.63],[18.81,8.98],[21.0,9.48],[21.72,10.57],[22.86,11.14],[23.55,10.09],[23.46,8.95],[25.11,7.83],[27.98,4.41],[29.72,4.6],[30.83,3.51],[30.77,2.34],[31.17,2.2],[29.88,0.6],[29.02,-2.84],[29.42,-5.94]
-        ]},
-        { color: '#C0392B', pts: [ // East Africa
-          [38.8,-6.48],[39.44,-6.84],[39.19,-8.49],[40.32,-10.32],[37.47,-11.57],[34.56,-11.52],[33.74,-9.42],[30.74,-8.34],[29.42,-5.94],[29.02,-2.84],[29.88,0.6],[31.17,2.2],[30.77,2.34],[30.83,3.51],[33.39,3.79],[35.3,5.51],[34.08,7.23],[32.95,7.78],[33.29,8.35],[33.83,8.38],[34.26,10.63],[35.86,12.58],[36.85,16.96],[38.41,18.0],[39.27,15.92],[43.08,12.7],[43.29,11.97],[42.72,11.74],[44.12,10.45],[50.73,12.02],[51.13,11.75],[50.55,9.2],[48.59,5.34],[46.56,2.86],[43.14,0.29],[41.59,-1.68],[40.26,-2.57],[39.2,-4.68],[38.8,-6.48]
-        ]},
-        { color: '#3FA9A0', pts: [ // Southern Africa
-          [32.92,-26.22],[32.2,-28.75],[30.06,-31.14],[27.46,-33.23],[25.78,-33.94],[22.57,-33.86],[20.07,-34.8],[18.38,-34.14],[17.93,-32.61],[18.25,-32.43],[18.22,-31.66],[15.21,-27.09],[14.26,-22.11],[11.79,-18.07],[11.78,-15.79],[13.74,-11.3],[12.88,-9.17],[13.24,-8.56],[12.32,-6.1],[16.33,-5.88],[17.47,-8.07],[19.02,-7.99],[19.42,-7.16],[20.09,-6.94],[20.6,-6.94],[20.51,-7.3],[21.73,-7.29],[22.16,-11.08],[24.26,-10.95],[24.31,-11.26],[26.55,-11.92],[27.16,-11.61],[28.93,-13.25],[29.7,-13.26],[29.62,-12.18],[29.34,-12.36],[28.37,-11.79],[28.45,-9.16],[29.0,-8.41],[30.35,-8.24],[33.74,-9.42],[34.56,-11.52],[37.47,-11.57],[40.32,-10.32],[40.78,-14.69],[40.48,-15.41],[39.45,-16.72],[37.41,-17.59],[34.79,-19.78],[34.7,-20.5],[35.56,-22.09],[35.61,-23.71],[35.04,-24.48],[32.57,-25.73],[32.92,-26.22]
-        ]}
-      ];
-
-      ctx.save();
-      pathFor(africaPts);
-      ctx.clip(); // trims any tiny mismatch at the coastline from a different simplification pass
-      regionShapes.forEach(function(region){
-        ctx.beginPath();
-        region.pts.forEach(function(p, i){
-          var xy = project(p[0], p[1]);
-          if (i === 0) ctx.moveTo(xy[0], xy[1]); else ctx.lineTo(xy[0], xy[1]);
-        });
-        ctx.closePath();
-        ctx.fillStyle = rgba(region.color, 0.62);
-        ctx.fill();
-      });
-      ctx.restore();
-
-      // crisp gold coastline on top, with a soft teal glow so it still
-      // reads as one floating object rather than five separate blocks
-      ctx.save();
-      ctx.shadowColor = 'rgba(63,169,160,0.85)';
-      ctx.shadowBlur = 14;
-      drawShape(africaPts, { stroke: '#d4a73a', lineWidth: 2.5 });
-      drawShape(madagascarPts, { fill: rgba('#3FA9A0', 0.55), stroke: '#d4a73a', lineWidth: 2 });
-      ctx.restore();
-
-      var tex = new THREE.CanvasTexture(c);
-      tex.needsUpdate = true;
-      return { texture: tex, w: w, h: h, project: project };
-    }
-
-    function buildGlobe(size){
-      var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.setSize(size, size, false);
-
-      var scene = new THREE.Scene();
-      var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-      camera.position.set(0, 0, 6.4);
-      camera.updateMatrixWorld(true); // required before any .project(camera) call below —
-                                       // otherwise it uses the camera's stale default matrix
-
-      // static group: the Africa map + the risk-marker points never rotate,
-      // so the 2D scan lens can reliably land on each one
-      var staticGroup = new THREE.Group();
-      scene.add(staticGroup);
-
-      // Africa is a flat, transparent-backed plane — not wrapped on a sphere —
-      // so it visibly floats as its own static object rather than reading as
-      // part of the spinning wireframe ball
-      var mapData = buildMapTexture();
-      var planeW = 2.6;
-      var planeH = planeW * (mapData.h / mapData.w);
-      var core = new THREE.Mesh(
-        new THREE.PlaneGeometry(planeW, planeH),
-        new THREE.MeshBasicMaterial({ map: mapData.texture, transparent: true, side: THREE.DoubleSide })
-      );
-      staticGroup.add(core);
-
-      // each marker's target is its region's centroid — projected through
-      // the camera the same way as before, but there's no dot mesh to draw
-      // anymore since the region itself is already visible on the map
-      function markerToPlaneXY(lon, lat){
-        var xy = mapData.project(lon, lat);
-        return {
-          x: (xy[0] / mapData.w - 0.5) * planeW,
-          y: (0.5 - xy[1] / mapData.h) * planeH
-        };
-      }
-
-      markers.forEach(function(m){
-        var p = markerToPlaneXY(m.lon, m.lat);
-        var point = new THREE.Vector3(p.x, p.y, 0.02);
-
-        var screenPos = point.clone().project(camera);
-        var canvasPctX = (screenPos.x * 0.5 + 0.5) * 100;
-        var canvasPctY = (1 - (screenPos.y * 0.5 + 0.5)) * 100;
-        // the canvas itself sits inset 6% within .globe-box (see .globe-canvas-wrap)
-        var nudge = m.nudge || { top: 0, left: 0 };
-        m.pos.left = 6 + canvasPctX * 0.88 + nudge.left;
-        m.pos.top = 6 + canvasPctY * 0.88 + nudge.top;
-      });
-
-      // the wireframe shell spins on its own — purely a visual "the globe
-      // is turning" cue, independent of the static map and points inside it
-      var wire = new THREE.Mesh(
-        new THREE.SphereGeometry(2, 30, 22),
-        new THREE.MeshBasicMaterial({ color: 0x3fa9a0, wireframe: true, transparent: true, opacity: 0.4 })
-      );
-      scene.add(wire);
-
-      var clock = new THREE.Clock();
-      function animate(){
-        requestAnimationFrame(animate);
-        if(!reduceMotion){ wire.rotation.y += clock.getDelta() * 0.2; }
-        renderer.render(scene, camera);
-      }
-      animate();
-
-      window.addEventListener('resize', function(){
-        var s = wrap.clientWidth || size;
-        renderer.setSize(s, s, false);
-        camera.aspect = 1;
-        camera.updateProjectionMatrix();
-      });
-
-      if(!firstBuildDone){ firstBuildDone = true; runFullPass(); }
-    }
-
-    function startGlobe(){
-      var size = wrap.clientWidth || 0;
-      if(size < 10){
-        // layout hadn't settled on the first measurement — try again shortly
-        requestAnimationFrame(function(){
-          requestAnimationFrame(function(){
-            buildGlobe(wrap.clientWidth || 400);
-          });
-        });
-        return;
-      }
-      buildGlobe(size);
-    }
-
-    // the microscope/lens slowly sweeps between risk markers on the globe,
-    // surfacing the matching intel card each time it settles. It runs a full
-    // pass through every point once, then tells the hero slideshow it's done
-    // — the slideshow waits for that signal before advancing. These need to
-    // exist before startGlobe() runs, since buildGlobe can call runFullPass()
-    // synchronously as soon as marker positions are computed.
-    var scanLens = document.getElementById('scanLens');
-    var intelCard = document.getElementById('intelCard');
-    var intelTag = document.getElementById('intelTag');
-    var intelText = document.getElementById('intelText');
-    var tagColor = { ADVISORY: 'var(--red)', WATCH: 'var(--gold)', CLEAR: 'var(--teal)' };
-    var pointDwell = 6800; // time spent on each point before moving to the next
-    var running = false;
-
-    function sweepTo(m){
-      scanLens.style.top = m.pos.top + '%';
-      scanLens.style.left = m.pos.left + '%';
-      intelCard.classList.remove('show');
-      setTimeout(function(){
-        intelTag.textContent = m.tag;
-        intelTag.style.color = tagColor[m.tag];
-        intelText.textContent = m.text;
-        intelCard.classList.add('show');
-      }, reduceMotion ? 0 : 2600);
-    }
-
-    function runFullPass(){
-      if(running) return;
-      running = true;
-      var idx = 0;
-      sweepTo(markers[idx]);
-
-      if(reduceMotion){
-        running = false;
-        document.dispatchEvent(new CustomEvent('afGlobeCycleDone'));
-        return;
-      }
-
-      function step(){
-        idx++;
-        if(idx < markers.length){
-          sweepTo(markers[idx]);
-          setTimeout(step, pointDwell);
-        } else {
-          running = false;
-          document.dispatchEvent(new CustomEvent('afGlobeCycleDone'));
-        }
-      }
-      setTimeout(step, pointDwell);
-    }
-
-    startGlobe();
-
-    // the first pass is triggered from inside buildGlobe once marker screen
-    // positions are actually known; this just handles every subsequent time
-    // the hero slideshow brings this slide back around
-    document.addEventListener('afHeroSlideChanged', function(e){
-      if(e.detail && e.detail.index === 0) runFullPass();
-    });
-  })();
-
-  // Kenya route map (Travel Security slide) — drawn map blended with the
-  // brand palette, with an analyst figure scanning slowly along the routes
-  (function(){
-    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var svg = document.getElementById('kenyaMapSvg');
-    if(!svg) return;
-
-    // simplified, stylized Kenya outline (not survey-accurate — decorative)
-    var kenyaOutline = '30,10 65,8 78,25 70,45 85,55 78,70 60,88 40,90 25,72 15,55 20,35 12,22 30,10';
-
-    svg.innerHTML =
-      '<defs>' +
-        '<linearGradient id="kenyaFill" x1="0" y1="0" x2="1" y2="1">' +
-          '<stop offset="0" stop-color="#3fa9a0" stop-opacity="0.6"/>' +
-          '<stop offset="1" stop-color="#d4a73a" stop-opacity="0.45"/>' +
-        '</linearGradient>' +
-      '</defs>' +
-      '<g stroke="rgba(212,167,58,0.1)" stroke-width="0.4">' +
-        '<line x1="0" y1="20" x2="100" y2="20"/><line x1="0" y1="40" x2="100" y2="40"/>' +
-        '<line x1="0" y1="60" x2="100" y2="60"/><line x1="0" y1="80" x2="100" y2="80"/>' +
-        '<line x1="20" y1="0" x2="20" y2="100"/><line x1="40" y1="0" x2="40" y2="100"/>' +
-        '<line x1="60" y1="0" x2="60" y2="100"/><line x1="80" y1="0" x2="80" y2="100"/>' +
-      '</g>' +
-      '<polygon points="' + kenyaOutline + '" fill="url(#kenyaFill)" stroke="#d4a73a" stroke-width="1" ' +
-        'style="filter:drop-shadow(0 0 5px rgba(63,169,160,0.7))"/>';
-
-    // waypoints along the convoy loop — positions are in the same 0–100 space as the SVG viewBox
-    var waypoints = [
-      { name: 'Nairobi', x: 45, y: 55, tag: 'CLEAR',    text: 'Convoy staging point — cleared for departure' },
-      { name: 'Nakuru',  x: 35, y: 42, tag: 'WATCH',    text: 'Checkpoint bypass — monitor local advisories' },
-      { name: 'Kisumu',  x: 20, y: 40, tag: 'CLEAR',    text: 'Route conditions nominal — western corridor' },
-      { name: 'Garissa', x: 65, y: 40, tag: 'WATCH',    text: 'Security escort recommended — eastern route' },
-      { name: 'Mombasa', x: 68, y: 72, tag: 'ADVISORY', text: 'Coastal corridor — port congestion delays' }
-    ];
-
-    var routeLine = document.getElementById('kenyaRouteLine');
-    var pts = waypoints.map(function(w){ return w.x + ',' + w.y; });
-    pts.push(pts[0]);
-    routeLine.setAttribute('points', pts.join(' '));
-
-    var scanFigure = document.getElementById('kenyaScanFigure');
-    var intelCard = document.getElementById('kenyaIntelCard');
-    var intelTag = document.getElementById('kenyaIntelTag');
-    var intelText = document.getElementById('kenyaIntelText');
-    var nodeHits = document.getElementById('kenyaNodeHits');
-    var tagColor = { ADVISORY: 'var(--red)', WATCH: 'var(--gold)', CLEAR: 'var(--teal)' };
-    var wi = 0;
-    var cycleTimer = null;
-
-    function sweepTo(w){
-      scanFigure.style.top = w.y + '%';
-      scanFigure.style.left = w.x + '%';
-      intelCard.classList.remove('show');
-      setTimeout(function(){
-        intelTag.textContent = w.tag;
-        intelTag.style.color = tagColor[w.tag];
-        intelText.textContent = w.name + ' — ' + w.text;
-        intelCard.classList.add('show');
-      }, reduceMotion ? 0 : 2600);
-    }
-
-    function startCycle(){
-      cycleTimer = setInterval(function(){
-        wi = (wi + 1) % waypoints.length;
-        sweepTo(waypoints[wi]);
-      }, 9500);
-    }
-    function resetCycle(){
-      if(cycleTimer) clearInterval(cycleTimer);
-      if(!reduceMotion) startCycle();
-    }
-
-    waypoints.forEach(function(w, idx){
-      var hit = document.createElement('button');
-      hit.type = 'button';
-      hit.className = 'node-hit';
-      hit.style.top = w.y + '%';
-      hit.style.left = w.x + '%';
-      hit.setAttribute('aria-label', w.name + ' — ' + w.tag + ': ' + w.text);
-      hit.addEventListener('click', function(){
-        wi = idx;
-        sweepTo(w);
-        resetCycle();
-      });
-      nodeHits.appendChild(hit);
-    });
-
-    sweepTo(waypoints[0]);
-    if(!reduceMotion){
-      startCycle();
-    }
-  })();
 
   // Hero slideshow
   (function(){
@@ -1147,32 +805,17 @@
     let current = 0;
     let timer;
 
-    // dwell time per slide (ms) — slide 2 (travel route map) gets extra time
-    // for its scanning animation. Slide 0 (globe) has no fixed dwell at all:
-    // it only advances once the microscope has visited all 5 points (see the
-    // 'afGlobeCycleDone' listener below).
-    const dwell = [null, 6500, 13000, 6500];
-
     function show(index){
       slides[current].classList.remove('active');
       dots[current].classList.remove('active');
       current = (index + slides.length) % slides.length;
       slides[current].classList.add('active');
       dots[current].classList.add('active');
-      document.dispatchEvent(new CustomEvent('afHeroSlideChanged', { detail: { index: current } }));
     }
     function next(){ show(current + 1); }
     function prev(){ show(current - 1); }
-    function startAutoplay(){
-      clearTimeout(timer);
-      if(dwell[current] == null) return; // slide 0 waits for the globe instead
-      timer = setTimeout(function(){ next(); startAutoplay(); }, dwell[current]);
-    }
-    function resetAutoplay(){ clearTimeout(timer); startAutoplay(); }
-
-    document.addEventListener('afGlobeCycleDone', function(){
-      if(current === 0){ next(); startAutoplay(); }
-    });
+    function startAutoplay(){ timer = setInterval(next, 6500); }
+    function resetAutoplay(){ clearInterval(timer); startAutoplay(); }
 
     dots.forEach((dot, i) => dot.addEventListener('click', () => { show(i); resetAutoplay(); }));
     if(nextBtn) nextBtn.addEventListener('click', () => { next(); resetAutoplay(); });
@@ -1182,8 +825,9 @@
   })();
   document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+      const group = btn.closest('.tabs-wrap');
+      group.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      group.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById(btn.dataset.tab).classList.add('active');
     });
