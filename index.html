@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AfriLens Risk Consulting | Intelligence for a Dynamic Africa</title>
-<meta name="description" content="AfriLens delivers real-time security intelligence and travel security services for organizations operating across Africa.">
+<meta name="description" content="AfriLens delivers real-time security intelligence, due diligence, stakeholder advisory, and travel security services for organizations operating across Africa.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -349,6 +349,9 @@
     font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600; color:var(--gold);
   }
   .card-link:hover{color:#e6bb4d;}
+  .card ul.card-bullets{list-style:none; margin-top:14px; display:flex; flex-direction:column; gap:8px;}
+  .card ul.card-bullets li{padding-left:16px; position:relative; color:var(--text-dim); font-size:13.5px;}
+  .card ul.card-bullets li::before{content:"—"; position:absolute; left:0; color:var(--teal);}
 
   /* Tabs */
   .tabs-wrap{display:grid; grid-template-columns:0.85fr 1.15fr; gap:50px; align-items:start;}
@@ -575,8 +578,9 @@
   <div class="wrap">
     <div class="eyebrow">SITREP · OVERVIEW</div>
     <h2>Security, simplified for a continent in motion.</h2>
-    <p>AfriLens specializes in synthesized security information and travel security services for organizations operating across Africa — turning a fast-moving landscape of political, security, and health risk into clear, actionable intelligence.</p>
-    <p>We help protect your people and operations through proactive monitoring, tailored assessments, and journey support built specifically for African conditions.</p>
+    <p>AfriLens specializes in synthesized security information and travel security services for organizations operating across Africa — turning a fast-moving landscape of political, security, operational, and health risk into clear, actionable intelligence.</p>
+    <p>We help protect your people, assets, and operations through proactive monitoring, tailored assessments, in-country diligence, and journey support built specifically for African conditions — for corporates, investors, NGOs, diplomatic missions, and high-net-worth individuals alike.</p>
+    <p>Where global risk consultancies apply a continent-wide lens to Africa, AfriLens is built the other way around: an Africa-first team with on-the-ground reach, calibrated to the pace and specifics of each market we cover.</p>
   </div>
 </div>
 
@@ -592,16 +596,51 @@
         <span class="card-num mono">[ MONITOR ]</span>
         <h3>Security Monitoring</h3>
         <p>Continuous, real-time surveillance of the African landscape. When a threat emerges, you're notified immediately — giving you the window to act before it escalates.</p>
+        <ul class="card-bullets">
+          <li>24/7 signal detection across political, security, and health indicators</li>
+          <li>Custom alert thresholds by country, sector, or site</li>
+          <li>Direct escalation to your duty officer or crisis lead</li>
+        </ul>
       </div>
       <div class="card">
         <span class="card-num mono">[ REPORT ]</span>
         <h3>Intelligence Reporting</h3>
         <p>Daily, weekly, monthly, and annual briefings that go beyond the headline — contextualized analysis of security, political, and health trends to support long-term planning.</p>
+        <ul class="card-bullets">
+          <li>Country and regional risk outlooks for board and investment-committee use</li>
+          <li>Election, civil unrest, and major-event risk trackers</li>
+          <li>Sector-specific briefing packs — energy, mining, logistics, NGO, and more</li>
+        </ul>
       </div>
       <div class="card">
         <span class="card-num mono">[ ASSESS ]</span>
         <h3>Bespoke Assessments</h3>
         <p>Focused briefs on a specific concern — a regional flashpoint, a single site, a single trip — with analysis and recommendations sized to the decision in front of you.</p>
+        <ul class="card-bullets">
+          <li>Site and facility security & vulnerability assessments</li>
+          <li>Market-entry and country-risk feasibility studies</li>
+          <li>Rapid-turnaround briefs ahead of travel, launches, or events</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="card-num mono">[ VERIFY ]</span>
+        <h3>Due Diligence &amp; Corporate Intelligence</h3>
+        <p>Ground-truthed diligence for investors, lenders, and legal counsel before capital, a partner, or a hire is committed to.</p>
+        <ul class="card-bullets">
+          <li>Site and asset verification, background and reputational checks</li>
+          <li>Partner, supplier, and counterparty screening</li>
+          <li>Workplace misconduct and fraud investigations, discreetly handled</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="card-num mono">[ ENGAGE ]</span>
+        <h3>Stakeholder &amp; Political Risk Advisory</h3>
+        <p>Navigating government, community, and regulatory relationships so your project keeps its social license to operate.</p>
+        <ul class="card-bullets">
+          <li>Stakeholder mapping for energy, mining, and infrastructure projects</li>
+          <li>Political and regulatory change tracking by sector</li>
+          <li>Anti-corruption protocols and ethical-sourcing guidance</li>
+        </ul>
       </div>
       <div class="card card--featured" id="lens-card">
         <span class="card-num mono">[ ACCESS ]</span>
@@ -619,13 +658,14 @@
     <div class="section-head">
       <div class="eyebrow">CAPABILITY 02</div>
       <h2>Travel Security Services</h2>
-      <p>From route planning to convoy escort, we manage the logistics of moving safely through unfamiliar terrain.</p>
+      <p>From route planning to convoy escort to crisis evacuation, we manage the logistics of moving safely through unfamiliar terrain — before, during, and after the journey.</p>
     </div>
     <div class="tabs-wrap">
       <div class="tab-buttons">
         <button class="tab-btn active" data-tab="t1">Secure Journey Management <span class="mono">01</span></button>
-        <button class="tab-btn" data-tab="t2">Convoy Escorts <span class="mono">02</span></button>
+        <button class="tab-btn" data-tab="t2">Convoy Escorts &amp; Close Protection <span class="mono">02</span></button>
         <button class="tab-btn" data-tab="t3">Asset Tracking <span class="mono">03</span></button>
+        <button class="tab-btn" data-tab="t4">Crisis &amp; Emergency Response <span class="mono">04</span></button>
       </div>
       <div>
         <div class="tab-panel active" id="t1">
@@ -634,15 +674,17 @@
             <li><b>Trip risk assessment</b> — route mapping, location-level risk analysis, and emergency contact points, culminating in a clear overall risk rating.</li>
             <li><b>Arrival & departure assistance</b> — coordinated logistics with local authorities and transport.</li>
             <li><b>Security briefings</b> — delivered online or on arrival, so your team knows exactly what to expect.</li>
-            <li><b>Expert route planning</b> — built on deep, current knowledge of African terrain and conditions.</li>
+            <li><b>Expert route planning</b> — built on deep, current knowledge of African terrain and conditions, with contingency routes built in.</li>
             <li><b>Vehicle & driver management</b> — including armored options and security-trained drivers.</li>
+            <li><b>Traveler tracking & duty-of-care records</b> — a clear log of where your people are, for compliance and peace of mind.</li>
           </ul>
         </div>
         <div class="tab-panel" id="t2">
-          <h4>Added protection for high-value assets</h4>
+          <h4>Added protection for high-value assets and individuals</h4>
           <ul>
             <li><b>Route & security planning</b> — including Plan B contingency routes and designated safe zones.</li>
-            <li><b>Close protection officers</b> — licensed, discreet, and trained for high-risk movement.</li>
+            <li><b>Close protection officers</b> — licensed, discreet, and trained for high-risk movement, drawn from vetted local networks.</li>
+            <li><b>Executive & high-net-worth protection</b> — residence, event, and personal security scoped to the individual's risk profile.</li>
             <li><b>Medical response coordination</b> — rapid assistance and evacuation by road or air if required.</li>
             <li><b>Dedicated liaison officer</b> — your on-the-ground point of contact, fluent in English or French.</li>
           </ul>
@@ -652,7 +694,17 @@
           <ul>
             <li><b>Multi-layered tracking</b> — real-time device and platform monitoring of vehicles and personnel.</li>
             <li><b>Secure communication protocols</b> — clear, tested coordination between your team and ours.</li>
+            <li><b>Geofenced alerting</b> — automatic notification the moment a traveler or asset enters a flagged area.</li>
             <li><b>Emergency response services</b> — accident management, medical support, and rapid escalation when it matters.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="t4">
+          <h4>Ready before the crisis, not after</h4>
+          <ul>
+            <li><b>Crisis management planning</b> — pre-built response plans for civil unrest, natural disaster, or a sudden security incident.</li>
+            <li><b>Medical & security evacuation</b> — coordinated extraction by road or air, and access to safe havens when conditions deteriorate.</li>
+            <li><b>24/7 emergency response desk</b> — a single number to call, staffed around the clock during active incidents.</li>
+            <li><b>Post-incident support</b> — debriefs, reporting, and reviewed lessons to strengthen the next journey.</li>
           </ul>
         </div>
       </div>
@@ -671,7 +723,7 @@
       <div class="why-item">
         <div class="mono">01</div>
         <h4>Unwavering expertise</h4>
-        <p>Our analysts track the full spectrum of risk — from political instability to physical and cyber threats.</p>
+        <p>Our analysts track the full spectrum of risk — political, security, operational, reputational, and health — across every market we cover.</p>
       </div>
       <div class="why-item">
         <div class="mono">02</div>
@@ -681,12 +733,12 @@
       <div class="why-item">
         <div class="mono">03</div>
         <h4>Local knowledge</h4>
-        <p>On-the-ground experience across African markets, paired with a global standard of reporting.</p>
+        <p>On-the-ground networks and analysts across African markets, paired with a global standard of reporting and evidence.</p>
       </div>
       <div class="why-item">
         <div class="mono">04</div>
         <h4>Flexible delivery</h4>
-        <p>Services structured around how your organization already works — not the other way around.</p>
+        <p>From a single briefing to an embedded programme, services structured around how your organization already works — not the other way around.</p>
       </div>
     </div>
   </div>
@@ -711,8 +763,12 @@
       <select id="need">
         <option>Security monitoring & alerts</option>
         <option>Intelligence reporting</option>
+        <option>Bespoke risk assessment</option>
+        <option>Due diligence & corporate intelligence</option>
+        <option>Stakeholder & political risk advisory</option>
         <option>Travel & journey management</option>
-        <option>Convoy escort</option>
+        <option>Convoy escort & close protection</option>
+        <option>Crisis & emergency response</option>
         <option>Not sure — advise me</option>
       </select>
       <button class="btn btn-primary" type="submit">REQUEST FREE TRIAL →</button>
@@ -731,8 +787,11 @@
         <h5>Services</h5>
         <a href="#sis">Security Monitoring</a>
         <a href="#sis">Intelligence Reporting</a>
+        <a href="#sis">Due Diligence & Corporate Intelligence</a>
+        <a href="#sis">Stakeholder & Political Risk Advisory</a>
         <a href="#tss">Journey Management</a>
-        <a href="#tss">Convoy Escorts</a>
+        <a href="#tss">Convoy Escorts & Close Protection</a>
+        <a href="#tss">Crisis & Emergency Response</a>
       </div>
       <div class="footer-col">
         <h5>Company</h5>
